@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not here — endless library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<script>
+  /* GitHub Pages can't do server-side redirects, so this page doubles as the
+     forwarder for paths that used to belong to Discourse when the forum lived
+     on the apex domain. Unknown paths fall through to the message below. */
+  var FORUM = 'https://shush.endlesslibrary.online';
+  var FORUM_PATHS = /^\/(t|c|u|g|tag|tags|badges|categories|latest|top|new|unread|hot|login|signup|session|invites|my|admin|about|faq|guidelines|tos|privacy|upcoming-events|uploads|user_avatar|letter_avatar)(\/|$)/;
+
+  if (FORUM_PATHS.test(location.pathname)) {
+    location.replace(FORUM + location.pathname + location.search + location.hash);
+  }
+</script>
+<style>
+  :root{
+    --paper:#fff;
+    --ink:#16150f;
+    --stamp:#9B9B98;
+    --faded:#7e7e73;
+    --rule:rgba(22,21,15,.16);
+    --display:"Gloock",Georgia,serif;
+    --body:Garamond,serif;
+    --util:Garamond,serif;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+
+  body{
+    margin:0;
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    padding:40px 24px;
+    text-align:center;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-weight:300;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* paper grain — the material, not decoration */
+  .grain{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:50;
+    opacity:.4;
+    mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='.22'/></svg>");
+  }
+
+  .eyebrow{
+    font-family:var(--util);
+    font-size:.68rem;
+    letter-spacing:.3em;
+    text-transform:uppercase;
+    color:var(--faded);
+  }
+
+  h1{
+    font-family:var(--display);
+    font-weight:400;
+    font-size:clamp(2rem,7vw,3rem);
+    line-height:1;
+    letter-spacing:-.01em;
+    margin:0;
+  }
+
+  p.desc{
+    font-size:1.05rem;
+    line-height:1.5;
+    margin:0;
+    max-width:34ch;
+    color:rgba(22,21,15,.82);
+  }
+
+  .links{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+    margin-top:14px;
+  }
+  .links a{
+    font-family:var(--util);
+    font-weight:400;
+    font-size:.72rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--ink);
+    border:3px solid transparent;
+    border-radius:999px;
+    padding:10px 20px 9px;
+    text-decoration-line:underline;
+    text-decoration-color:transparent;
+    text-decoration-thickness:3px;
+    text-underline-offset:4px;
+    transition:background .18s ease,color .18s ease,border-color .18s ease,text-decoration-color .18s ease;
+  }
+  .links a#link-forum{
+    border-color:rgba(22,21,15,.42);
+  }
+  .links a:hover,
+  .links a:focus-visible{
+    text-decoration-color:var(--stamp);
+  }
+  .links a#link-forum:hover,
+  .links a#link-forum:focus-visible{
+    background:var(--stamp);
+    border-color:var(--stamp);
+    color:var(--paper);
+    text-decoration-color:transparent;
+  }
+
+  :focus-visible{outline:2px solid var(--stamp);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<span class="eyebrow">Not on the shelf</span>
+<h1>This one isn't here</h1>
+<p class="desc">The page you asked for doesn't exist on this site. It may live on the forum instead.</p>
+
+<nav class="links">
+  <a id="link-home" href="/">Front page</a>
+  <a id="link-forum" href="https://shush.endlesslibrary.online">Shush</a>
+</nav>
+
+</body>
+</html>

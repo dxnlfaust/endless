@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>endless library</title>
+<meta name="description" content="2222 endless 2222">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fff;
+    --ink:#16150f;
+    --stamp:#9B9B98;
+    --faded:#7e7e73;
+    --rule:rgba(22,21,15,.16);
+    --display:"Gloock",Georgia,serif;
+    --body:Garamond,serif;
+    --util:Garamond,serif;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-weight:300;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* paper grain — the material, not decoration */
+  .grain{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:50;
+    opacity:.4;
+    mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='.22'/></svg>");
+  }
+
+  /* ─────────── hero ─────────── */
+  .hero{
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:56px 24px 40px;
+    position:relative;
+    text-align:center;
+  }
+
+  .mark{
+    width:min(380px,72vw);
+    aspect-ratio:1076/727;
+    margin-bottom:6px;
+  }
+  .mark img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    mix-blend-mode:multiply;
+  }
+
+  .wordmark{
+    font-family:var(--display);
+    font-weight:400;
+    font-size:clamp(2.6rem,9.2vw,5.4rem);
+    line-height:.92;
+    letter-spacing:-.028em;
+    margin:0;
+    text-transform:lowercase;
+  }
+
+  .tagline{
+    font-family:var(--util);
+    font-size:.68rem;
+    letter-spacing:.3em;
+    text-transform:uppercase;
+    color:var(--faded);
+    margin:18px 0 0;
+  }
+
+  .links{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+    margin-top:34px;
+  }
+  .links a{
+    font-family:var(--util);
+    font-weight:400;
+    font-size:.72rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--ink);
+    border:3px solid transparent;
+    border-radius:999px;
+    padding:10px 20px 9px;
+    text-decoration-line:underline;
+    text-decoration-color:transparent;
+    text-decoration-thickness:3px;
+    text-underline-offset:4px;
+    transition:background .18s ease,color .18s ease,border-color .18s ease,text-decoration-color .18s ease;
+  }
+  .links a#link-forum{
+    border-color:rgba(22,21,15,.42);
+  }
+  .links a:hover,
+  .links a:focus-visible{
+    text-decoration-color:var(--stamp);
+  }
+  .links a#link-forum:hover,
+  .links a#link-forum:focus-visible{
+    background:var(--stamp);
+    border-color:var(--stamp);
+    color:var(--paper);
+    text-decoration-color:transparent;
+  }
+
+  .cue{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:26px;
+    width:max-content;
+    margin:0 auto;
+    font-family:var(--util);
+    font-size:.62rem;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    color:var(--faded);
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    gap:.7em;
+    font-weight:400;
+  }
+  .cue span{color:var(--stamp);animation:bob 2.6s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(-2px)}50%{transform:translateY(2px)}}
+
+  /* ─────────── events ─────────── */
+  .card{
+    max-width:720px;
+    margin:0 auto;
+    padding:0 24px 96px;
+  }
+
+  .card-head{
+    display:flex;
+    align-items:baseline;
+    gap:16px;
+    padding-bottom:14px;
+  }
+  .card-head h2{
+    font-family:var(--util);
+    font-weight:700;
+    font-size:.72rem;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    margin:0;
+    white-space:nowrap;
+  }
+  .card-head .fill{flex:1;height:1px;background:var(--rule)}
+  .card-head .count{
+    font-family:var(--util);
+    font-size:.68rem;
+    color:var(--faded);
+    white-space:nowrap;
+  }
+
+  .event{
+    display:grid;
+    grid-template-columns:104px 1fr;
+    gap:26px;
+    padding:30px 0;
+    border-top:1px solid var(--rule);
+    opacity:0;
+    transform:translateY(14px);
+    transition:opacity .7s ease,transform .7s ease;
+  }
+  .event.seen{opacity:1;transform:none}
+
+  .stamp{
+    font-family:var(--util);
+    font-weight:700;
+    color:var(--stamp);
+    border:3px solid var(--stamp);
+    padding:8px 4px 7px;
+    text-align:center;
+    line-height:1.1;
+    mix-blend-mode:multiply;
+    justify-self:start;
+    width:100%;
+  }
+  .stamp .m{display:block;font-size:.64rem;letter-spacing:.24em;text-transform:uppercase}
+  .stamp .d{display:block;font-size:1.34rem;letter-spacing:.04em;margin-top:2px}
+
+  .event h3{
+    font-family:var(--body);
+    font-weight:400;
+    font-size:1.34rem;
+    line-height:1.24;
+    letter-spacing:-.01em;
+    margin:0 0 7px;
+  }
+  .event h3 a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
+  .event h3 a:hover,
+  .event h3 a:focus-visible{border-bottom-color:var(--stamp)}
+
+  .meta{
+    font-family:var(--util);
+    font-size:.68rem;
+    letter-spacing:.06em;
+    color:var(--faded);
+    margin:0 0 10px;
+  }
+  .note{
+    font-size:1rem;
+    line-height:1.5;
+    margin:0;
+    max-width:44ch;
+    color:rgba(22,21,15,.82);
+  }
+
+  .empty{
+    border-top:1px solid var(--rule);
+    padding:40px 0 8px;
+    max-width:44ch;
+  }
+  .empty p{font-size:1rem;line-height:1.5;margin:0 0 14px}
+  .empty a{
+    font-family:var(--util);
+    font-size:.7rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink);
+    text-decoration:none;
+    border-bottom:1px solid var(--stamp);
+  }
+
+  .all{
+    border-top:1px solid var(--rule);
+    padding-top:22px;
+  }
+  .all a{
+    font-family:var(--util);
+    font-size:.7rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--faded);
+    text-decoration:none;
+  }
+  .all a:hover,.all a:focus-visible{color:var(--ink)}
+
+  /* page-load sequence */
+  .rise{opacity:0;transform:translateY(14px);animation:rise .9s cubic-bezier(.2,.7,.3,1) forwards}
+  .mark.rise{animation-delay:.05s}
+  .wordmark.rise{animation-delay:.32s}
+  .tagline.rise{animation-delay:.46s}
+  .links.rise{animation-delay:.58s}
+  .cue.rise{animation-delay:.9s}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  :focus-visible{outline:2px solid var(--stamp);outline-offset:3px}
+
+  @media (max-width:560px){
+    .event{grid-template-columns:1fr;gap:14px}
+    .stamp{width:88px}
+    .card-head .count{display:none}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .rise,.event{animation:none!important;opacity:1!important;transform:none!important;transition:none}
+    .cue span{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="hero">
+  <div class="mark rise">
+    <img src="mark.gif" alt="A heart drawn above an open book, stroke by stroke, in brush ink.">
+  </div>
+
+  <h1 class="wordmark rise">endless library</h1>
+  <nav class="links rise" aria-label="Sections">
+    <a id="link-about" href="#">About</a>
+    <a id="link-list" href="#">Mailing list</a>
+    <a id="link-forum" href="https://shush.endlesslibrary.online">Shush</a>
+  </nav>
+
+  <a class="cue rise" href="#whats-on">upcoming events <span aria-hidden="true">↓</span></a>
+</header>
+
+<main class="card" id="whats-on">
+  <div class="card-head">
+    <h2>upcoming events</h2>
+    <div class="fill" aria-hidden="true"></div>
+    <span class="count" id="count"></span>
+  </div>
+
+  <!-- Placeholder events. Replaced by live Discourse events when the fetch
+       succeeds. Kept on failure only while CONFIG.demo is true. -->
+  <div class="events" id="events" data-placeholder="true">
+    <article class="event">
+      <div class="stamp" aria-hidden="true"><span class="m">Jul</span><span class="d">29</span></div>
+      <div>
+        <h3>Silent reading hour</h3>
+        <p class="meta">Reading room, upstairs · 6.30–8pm · free</p>
+        <p class="note">If you talk you die.</p>
+      </div>
+    </article>
+
+    <article class="event">
+      <div class="stamp" aria-hidden="true"><span class="m">Aug</span><span class="d">02</span></div>
+      <div>
+        <h3>Orgy porgy</h3>
+        <p class="meta">Reading room · 11am · members and anyone curious</p>
+        <p class="note">Bring your reading.</p>
+      </div>
+    </article>
+
+    <article class="event">
+      <div class="stamp" aria-hidden="true"><span class="m">Aug</span><span class="d">09</span></div>
+      <div>
+        <h3>Book and fluid swapping</h3>
+        <p class="meta">Back room · 2–4pm · bring a draft</p>
+        <p class="note">Books for books, fluids for fluids, or books for fluids.</p>
+      </div>
+    </article>
+
+    <article class="event">
+      <div class="stamp" aria-hidden="true"><span class="m">Aug</span><span class="d">15</span></div>
+      <div>
+        <h3>DMT psychic showdown</h3>
+        <p class="meta">Workbench · 6–9pm · $12 for materials</p>
+        <p class="note">Winner takes all non-lethal psychic battles</p>
+      </div>
+    </article>
+
+    <article class="event">
+      <div class="stamp" aria-hidden="true"><span class="m">Aug</span><span class="d">23</span></div>
+      <div>
+        <h3>Night shift: freak-off</h3>
+        <p class="meta">Whole building · 9pm–midnight · free</p>
+        <p class="note">Freak da books out.</p>
+      </div>
+    </article>
+
+    <article class="event">
+      <div class="stamp" aria-hidden="true"><span class="m">Sep</span><span class="d">06</span></div>
+      <div>
+        <h3>Overloards and indentured workers LARP day!</h3>
+        <p class="meta">Front desk · all day · no questions</p>
+        <p class="note">Library board is overlords, members are indentured workers! Wretched filth, scrub the floors and dust the dustjackets!</p>
+      </div>
+    </article>
+  </div>
+
+  <div class="all"><a id="link-all" href="https://shush.endlesslibrary.online/upcoming-events">All events on the forum →</a></div>
+</main>
+
+<script>
+  /* ── Config ─────────────────────────────────────────────────────────── */
+  const CONFIG = {
+    forum: 'https://shush.endlesslibrary.online',
+    limit: 6,          // events shown on the landing page
+    demo: true         // true: keep placeholder events if the fetch fails.
+                       // Set to false before going live so a broken fetch
+                       // shows the "check the forum" state instead of fiction.
+  };
+
+  /* ── Wire the links ─────────────────────────────────────────────────── */
+  document.getElementById('link-forum').href = CONFIG.forum;
+  document.getElementById('link-all').href = CONFIG.forum + '/upcoming-events';
+
+  /* ── Helpers ────────────────────────────────────────────────────────── */
+  const MONTH = new Intl.DateTimeFormat('en-AU', { month: 'short' });
+
+  function clockTime(date) {
+    return date
+      .toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true })
+      .replace(':00', '')
+      .replace(/\s?(am|pm)/i, (m, p) => p.toLowerCase());
+  }
+
+  function timeRange(start, end) {
+    if (!end) return clockTime(start);
+    const sameDay = start.toDateString() === end.toDateString();
+    return sameDay ? clockTime(start) + '–' + clockTime(end) : clockTime(start);
+  }
+
+  function plainText(html, max) {
+    if (!html) return '';
+    const el = document.createElement('div');
+    el.innerHTML = html;
+    const text = (el.textContent || '').replace(/\s+/g, ' ').trim();
+    return text.length > max ? text.slice(0, max).replace(/\s\S*$/, '') + '…' : text;
+  }
+
+  function absolute(path) {
+    if (!path) return CONFIG.forum + '/upcoming-events';
+    try { return new URL(path, CONFIG.forum).href; } catch { return CONFIG.forum; }
+  }
+
+  /* ── Map one Discourse event object to what the page needs ──────────────
+     Field names come from the discourse-post-event serializer. Open
+     <forum>/discourse-post-event/events.json?include_details=true in a
+     browser once and adjust here if anything is named differently on your
+     version.                                                              */
+  function normalise(raw) {
+    const start = new Date(raw.starts_at);
+    if (isNaN(start)) return null;
+    const end = raw.ends_at ? new Date(raw.ends_at) : null;
+    const topic = (raw.post && raw.post.topic) || {};
+
+    return {
+      start,
+      end,
+      title: raw.name || topic.title || 'Untitled event',
+      url: absolute(raw.post && raw.post.url),
+      location: raw.location || '',
+      note: plainText(raw.description || raw.raw_description || '', 150)
+    };
+  }
+
+  /* ── Render ─────────────────────────────────────────────────────────── */
+  function render(events) {
+    const list = document.getElementById('events');
+    list.removeAttribute('data-placeholder');
+    list.textContent = '';
+
+    events.forEach(ev => {
+      const article = document.createElement('article');
+      article.className = 'event';
+
+      const stamp = document.createElement('div');
+      stamp.className = 'stamp';
+      stamp.setAttribute('aria-hidden', 'true');
+      stamp.innerHTML =
+        '<span class="m"></span><span class="d"></span>';
+      stamp.querySelector('.m').textContent = MONTH.format(ev.start);
+      stamp.querySelector('.d').textContent = String(ev.start.getDate()).padStart(2, '0');
+
+      const body = document.createElement('div');
+
+      const h3 = document.createElement('h3');
+      const link = document.createElement('a');
+      link.href = ev.url;
+      link.textContent = ev.title;
+      h3.appendChild(link);
+
+      const meta = document.createElement('p');
+      meta.className = 'meta';
+      meta.textContent = [ev.location, timeRange(ev.start, ev.end)].filter(Boolean).join(' · ');
+
+      body.append(h3, meta);
+
+      if (ev.note) {
+        const note = document.createElement('p');
+        note.className = 'note';
+        note.textContent = ev.note;
+        body.appendChild(note);
+      }
+
+      article.append(stamp, body);
+      list.appendChild(article);
+    });
+
+    document.getElementById('count').textContent =
+      events.length + (events.length === 1 ? ' stamped' : ' stamped');
+    reveal();
+  }
+
+  function renderEmpty() {
+    const list = document.getElementById('events');
+    list.removeAttribute('data-placeholder');
+    list.innerHTML =
+      '<div class="empty"><p>Nothing on the calendar just now. New dates get posted to the forum first.</p>' +
+      '<a href="' + CONFIG.forum + '/upcoming-events">Check the forum calendar</a></div>';
+    document.getElementById('count').textContent = '';
+  }
+
+  /* ── Scroll reveal ──────────────────────────────────────────────────── */
+  function reveal() {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('seen'), i * 90);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.15 });
+
+    document.querySelectorAll('.event').forEach(el => obs.observe(el));
+  }
+
+  /* ── Load ───────────────────────────────────────────────────────────── */
+  async function load() {
+    const url = CONFIG.forum +
+      '/discourse-post-event/events.json?include_details=true&limit=50';
+
+    try {
+      const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+
+      const now = Date.now();
+      const events = (data.events || [])
+        .map(normalise)
+        .filter(ev => ev && (ev.end || ev.start).getTime() >= now)
+        .sort((a, b) => a.start - b.start)
+        .slice(0, CONFIG.limit);
+
+      events.length ? render(events) : renderEmpty();
+    } catch (err) {
+      console.warn('[endless library] could not load events:', err.message);
+      if (CONFIG.demo) {
+        document.getElementById('count').textContent = 'placeholder';
+        reveal();
+      } else {
+        renderEmpty();
+      }
+    }
+  }
+
+  load();
+</script>
+</body>
+</html>
