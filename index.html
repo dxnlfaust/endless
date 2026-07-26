@@ -16,8 +16,8 @@
     --faded:#7e7e73;
     --rule:rgba(22,21,15,.16);
     --display:"Gloock",Georgia,serif;
-    --body:Garamond,serif;
-    --util:Garamond,serif;
+    --body:serif;
+    --util:sans-serif;
   }
 
   *{box-sizing:border-box}
@@ -478,7 +478,7 @@
     });
 
     document.getElementById('count').textContent =
-      events.length + (events.length === 1 ? ' stamped' : ' stamped');
+      events.length + (events.length === 1 ? ' event' : ' events');
     reveal();
   }
 
