@@ -203,6 +203,22 @@
   .stamp .m{display:block;font-size:.64rem;letter-spacing:.24em;text-transform:uppercase}
   .stamp .d{display:block;font-size:1.34rem;letter-spacing:.04em;margin-top:2px}
 
+  .stamp.stamp-image{
+    border:none;
+    padding:0;
+    mix-blend-mode:normal;
+    overflow:hidden;
+    aspect-ratio:4/5;
+    background-size:cover;
+    background-position:center;
+  }
+  .stamp.stamp-image img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+
   .event h3{
     font-family:var(--body);
     font-weight:400;
@@ -371,7 +387,7 @@
     </article>
   </div>
 
-  <div class="all"><a id="link-all" href="https://shush.endlesslibrary.online/upcoming-events">All events on the forum →</a></div>
+  <div class="all"><a id="link-all" href="https://shush.endlesslibrary.online/upcoming-events">All events on Shush →</a></div>
 </main>
 
 <script>
@@ -404,6 +420,22 @@
     return sameDay ? clockTime(start) + '–' + clockTime(end) : clockTime(start);
   }
 
+  function ordinal(n) {
+    const v = n % 100;
+    if (v >= 11 && v <= 13) return n + 'th';
+    switch (n % 10) {
+      case 1: return n + 'st';
+      case 2: return n + 'nd';
+      case 3: return n + 'rd';
+      default: return n + 'th';
+    }
+  }
+
+  function longDate(date) {
+    const month = date.toLocaleDateString('en-AU', { month: 'long' });
+    return month + ' ' + ordinal(date.getDate());
+  }
+
   function plainText(html, max) {
     if (!html) return '';
     const el = document.createElement('div');
@@ -427,6 +459,7 @@
     if (isNaN(start)) return null;
     const end = raw.ends_at ? new Date(raw.ends_at) : null;
     const topic = (raw.post && raw.post.topic) || {};
+    const upload = raw.image_upload || null;
 
     return {
       start,
@@ -434,7 +467,11 @@
       title: raw.name || topic.title || 'Untitled event',
       url: absolute(raw.post && raw.post.url),
       location: raw.location || '',
-      note: plainText(raw.description || raw.raw_description || '', 150)
+      note: plainText(raw.description || raw.raw_description || '', 150),
+      image: upload ? {
+        url: absolute((upload.thumbnail && upload.thumbnail.url) || upload.url),
+        color: upload.dominant_color ? '#' + upload.dominant_color : null
+      } : null
     };
   }
 
@@ -451,10 +488,20 @@
       const stamp = document.createElement('div');
       stamp.className = 'stamp';
       stamp.setAttribute('aria-hidden', 'true');
-      stamp.innerHTML =
-        '<span class="m"></span><span class="d"></span>';
-      stamp.querySelector('.m').textContent = MONTH.format(ev.start);
-      stamp.querySelector('.d').textContent = String(ev.start.getDate()).padStart(2, '0');
+
+      if (ev.image) {
+        stamp.classList.add('stamp-image');
+        if (ev.image.color) stamp.style.backgroundColor = ev.image.color;
+        const img = document.createElement('img');
+        img.src = ev.image.url;
+        img.alt = '';
+        img.loading = 'lazy';
+        stamp.appendChild(img);
+      } else {
+        stamp.innerHTML = '<span class="m"></span><span class="d"></span>';
+        stamp.querySelector('.m').textContent = MONTH.format(ev.start);
+        stamp.querySelector('.d').textContent = String(ev.start.getDate()).padStart(2, '0');
+      }
 
       const body = document.createElement('div');
 
@@ -466,7 +513,9 @@
 
       const meta = document.createElement('p');
       meta.className = 'meta';
-      meta.textContent = [ev.location, timeRange(ev.start, ev.end)].filter(Boolean).join(' · ');
+      const metaParts = ev.image ? [longDate(ev.start)] : [];
+      metaParts.push(ev.location, timeRange(ev.start, ev.end));
+      meta.textContent = metaParts.filter(Boolean).join(' · ');
 
       body.append(h3, meta);
 
