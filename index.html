@@ -238,6 +238,16 @@
     color:var(--faded);
     margin:0 0 10px;
   }
+  .meta a{
+    color:var(--ink);
+    text-decoration-line:underline;
+    text-decoration-color:var(--stamp);
+    text-decoration-thickness:2px;
+    text-underline-offset:2px;
+  }
+  .meta a:hover,
+  .meta a:focus-visible{color:var(--stamp)}
+
   .note{
     font-size:1rem;
     line-height:1.5;
@@ -245,19 +255,6 @@
     max-width:44ch;
     color:rgba(22,21,15,.82);
   }
-
-  .link-out{margin:8px 0 0}
-  .link-out a{
-    font-family:var(--util);
-    font-size:.8rem;
-    color:var(--ink);
-    text-decoration-line:underline;
-    text-decoration-color:var(--stamp);
-    text-decoration-thickness:2px;
-    text-underline-offset:3px;
-  }
-  .link-out a:hover,
-  .link-out a:focus-visible{color:var(--stamp)}
 
   .empty{
     border-top:1px solid var(--rule);
@@ -460,9 +457,9 @@
     return text.length > max ? text.slice(0, max).replace(/\s\S*$/, '') + '…' : text;
   }
 
-  /* Pull the first URL out of the description so it can be rendered as a
-     real link instead of visible plain text, and label it by what kind of
-     link it looks like. */
+  /* Pull the first URL out of a field (e.g. the event location) so it can be
+     rendered as a real link instead of visible plain text, and label it by
+     what kind of link it looks like. */
   function extractLink(text) {
     const match = text.match(/https?:\/\/\S+/i);
     if (!match) return { text, link: null };
@@ -495,16 +492,16 @@
     const end = raw.ends_at ? new Date(raw.ends_at) : null;
     const topic = (raw.post && raw.post.topic) || {};
     const upload = raw.image_upload || null;
-    const { text: descText, link: descLink } = extractLink(stripHtml(raw.description || raw.raw_description || ''));
+    const { text: locationText, link: locationLink } = extractLink(raw.location || '');
 
     return {
       start,
       end,
       title: raw.name || topic.title || 'Untitled event',
       url: absolute(raw.post && raw.post.url),
-      location: raw.location || '',
-      note: truncate(descText, 150),
-      link: descLink,
+      locationText,
+      locationLink,
+      note: truncate(stripHtml(raw.description || raw.raw_description || ''), 150),
       image: upload ? {
         url: absolute((upload.thumbnail && upload.thumbnail.url) || upload.url),
         color: upload.dominant_color ? '#' + upload.dominant_color : null
@@ -550,9 +547,25 @@
 
       const meta = document.createElement('p');
       meta.className = 'meta';
-      const metaParts = ev.image ? [longDate(ev.start)] : [];
-      metaParts.push(ev.location, timeRange(ev.start, ev.end));
-      meta.textContent = metaParts.filter(Boolean).join(' · ');
+      const metaParts = [];
+      if (ev.image) metaParts.push({ text: longDate(ev.start) });
+      if (ev.locationText) metaParts.push({ text: ev.locationText });
+      if (ev.locationLink) metaParts.push({ link: ev.locationLink });
+      metaParts.push({ text: timeRange(ev.start, ev.end) });
+
+      metaParts.forEach((part, i) => {
+        if (i > 0) meta.appendChild(document.createTextNode(' · '));
+        if (part.link) {
+          const a = document.createElement('a');
+          a.href = part.link.url;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.textContent = part.link.label;
+          meta.appendChild(a);
+        } else {
+          meta.appendChild(document.createTextNode(part.text));
+        }
+      });
 
       body.append(h3, meta);
 
@@ -561,18 +574,6 @@
         note.className = 'note';
         note.textContent = ev.note;
         body.appendChild(note);
-      }
-
-      if (ev.link) {
-        const out = document.createElement('p');
-        out.className = 'link-out';
-        const a = document.createElement('a');
-        a.href = ev.link.url;
-        a.target = '_blank';
-        a.rel = 'noopener';
-        a.textContent = ev.link.label;
-        out.appendChild(a);
-        body.appendChild(out);
       }
 
       article.append(stamp, body);
