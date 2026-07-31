@@ -43,6 +43,36 @@
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='.22'/></svg>");
   }
 
+  /* ─────────── about easter egg ─────────── */
+  .pac-line{
+    position:fixed;
+    left:0;
+    width:100%;
+    overflow:hidden;
+    z-index:60;
+    pointer-events:none;
+    opacity:0;
+    transition:opacity 2s ease-in-out;
+  }
+  .pac-line.pac-top{top:16.6667%;transform:translateY(-50%)}
+  .pac-line.pac-bottom{top:83.3333%;transform:translateY(-50%)}
+
+  .pac-track{
+    display:inline-block;
+    white-space:nowrap;
+    will-change:transform;
+    animation:pacScroll 7s linear infinite;
+  }
+  .pac-track span{
+    display:inline-block;
+    padding-right:6vw;
+    font-family:var(--display);
+    font-size:15vh;
+    line-height:1;
+    color:#FFDCF2;
+  }
+  @keyframes pacScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
   /* ─────────── hero ─────────── */
   .hero{
     min-height:100svh;
@@ -306,6 +336,7 @@
   @media (prefers-reduced-motion:reduce){
     .rise,.event{animation:none!important;opacity:1!important;transform:none!important;transition:none}
     .cue span{animation:none}
+    .pac-track{animation:none!important}
   }
 
   .ml-nbx .z-10 {
@@ -316,6 +347,17 @@
 <body>
 
 <div class="grain" aria-hidden="true"></div>
+
+<div class="pac-line pac-top" id="pac-top" aria-hidden="true">
+  <div class="pac-track">
+    <span>there are other libraries they have not told you about . . .</span><span>there are other libraries they have not told you about . . .</span>
+  </div>
+</div>
+<div class="pac-line pac-bottom" id="pac-bottom" aria-hidden="true">
+  <div class="pac-track">
+    <span>and they wish to speak with you</span><span>and they wish to speak with you</span>
+  </div>
+</div>
 
 <header class="hero">
   <div class="mark rise">
@@ -413,6 +455,23 @@
   /* ── Wire the links ─────────────────────────────────────────────────── */
   document.getElementById('link-forum').href = CONFIG.forum;
   document.getElementById('link-all').href = CONFIG.forum + '/upcoming-events';
+
+  /* ── About easter egg ──────────────────────────────────────────────────
+     No About page yet — clicking flashes the tagline across the screen
+     instead. The .pac-track marquee scrolls constantly regardless; opacity
+     is driven directly (not via a keyframe animation) so a click mid fade
+     just redirects the existing transition back up to 1, rather than
+     snapping to 0 and restarting — clicking again "juices it back up". */
+  let pacOutTimer = null;
+  document.getElementById('link-about').addEventListener('click', (e) => {
+    e.preventDefault();
+    const lines = [document.getElementById('pac-top'), document.getElementById('pac-bottom')];
+    clearTimeout(pacOutTimer);
+    lines.forEach(el => { el.style.opacity = '1'; });
+    pacOutTimer = setTimeout(() => {
+      lines.forEach(el => { el.style.opacity = '0'; });
+    }, 2000);
+  });
 
   /* ── Helpers ────────────────────────────────────────────────────────── */
   const MONTH = new Intl.DateTimeFormat('en-AU', { month: 'short' });
