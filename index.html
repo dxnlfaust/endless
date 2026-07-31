@@ -246,6 +246,19 @@
     color:rgba(22,21,15,.82);
   }
 
+  .link-out{margin:8px 0 0}
+  .link-out a{
+    font-family:var(--util);
+    font-size:.8rem;
+    color:var(--ink);
+    text-decoration-line:underline;
+    text-decoration-color:var(--stamp);
+    text-decoration-thickness:2px;
+    text-underline-offset:3px;
+  }
+  .link-out a:hover,
+  .link-out a:focus-visible{color:var(--stamp)}
+
   .empty{
     border-top:1px solid var(--rule);
     padding:40px 0 8px;
@@ -436,12 +449,34 @@
     return month + ' ' + ordinal(date.getDate());
   }
 
-  function plainText(html, max) {
+  function stripHtml(html) {
     if (!html) return '';
     const el = document.createElement('div');
     el.innerHTML = html;
-    const text = (el.textContent || '').replace(/\s+/g, ' ').trim();
+    return (el.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function truncate(text, max) {
     return text.length > max ? text.slice(0, max).replace(/\s\S*$/, '') + '…' : text;
+  }
+
+  /* Pull the first URL out of the description so it can be rendered as a
+     real link instead of visible plain text, and label it by what kind of
+     link it looks like. */
+  function extractLink(text) {
+    const match = text.match(/https?:\/\/\S+/i);
+    if (!match) return { text, link: null };
+
+    const url = match[0].replace(/[.,;:)\]]+$/, '');
+    const remaining = (text.slice(0, match.index) + text.slice(match.index + match[0].length))
+      .replace(/\s+/g, ' ')
+      .trim();
+    const lower = url.toLowerCase();
+    const label = lower.includes('rsvp') ? 'RSVP here'
+      : lower.includes('humanitix') ? 'Ticket link'
+      : 'Details';
+
+    return { text: remaining, link: { url, label } };
   }
 
   function absolute(path) {
@@ -460,6 +495,7 @@
     const end = raw.ends_at ? new Date(raw.ends_at) : null;
     const topic = (raw.post && raw.post.topic) || {};
     const upload = raw.image_upload || null;
+    const { text: descText, link: descLink } = extractLink(stripHtml(raw.description || raw.raw_description || ''));
 
     return {
       start,
@@ -467,7 +503,8 @@
       title: raw.name || topic.title || 'Untitled event',
       url: absolute(raw.post && raw.post.url),
       location: raw.location || '',
-      note: plainText(raw.description || raw.raw_description || '', 150),
+      note: truncate(descText, 150),
+      link: descLink,
       image: upload ? {
         url: absolute((upload.thumbnail && upload.thumbnail.url) || upload.url),
         color: upload.dominant_color ? '#' + upload.dominant_color : null
@@ -524,6 +561,18 @@
         note.className = 'note';
         note.textContent = ev.note;
         body.appendChild(note);
+      }
+
+      if (ev.link) {
+        const out = document.createElement('p');
+        out.className = 'link-out';
+        const a = document.createElement('a');
+        a.href = ev.link.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = ev.link.label;
+        out.appendChild(a);
+        body.appendChild(out);
       }
 
       article.append(stamp, body);
