@@ -1,7 +1,7 @@
-# endlesslibrary.online
+# endlesslibrary.com.au
 
 Landing page for Endless Library. Static, no build step, no dependencies.
-The forum lives separately at <https://shush.endlesslibrary.online> (Discourse, on the VPS).
+The forum lives separately at <https://shush.endlesslibrary.com.au> (Discourse, on the VPS).
 
 ## Files
 
@@ -29,7 +29,7 @@ the `<script>` block in `index.html`:
 
 ```js
 const CONFIG = {
-  forum: 'https://shush.endlesslibrary.online',
+  forum: 'https://shush.endlesslibrary.com.au',
   limit: 6,
   demo: true
 };
@@ -45,13 +45,13 @@ Requirements on the forum side:
 2. CORS allowing this origin. In `containers/app.yml` on the VPS:
    ```yaml
    DISCOURSE_ENABLE_CORS: true
-   DISCOURSE_CORS_ORIGIN: 'https://endlesslibrary.online'
+   DISCOURSE_CORS_ORIGIN: 'https://endlesslibrary.com.au'
    ```
-   then add `https://endlesslibrary.online` to the `cors origins` site setting.
+   then add `https://endlesslibrary.com.au` to the `cors origins` site setting.
 
 Field mapping from the Discourse response lives in `normalise()`. If events show
 up with missing titles or times, open
-`https://shush.endlesslibrary.online/discourse-post-event/events.json?include_details=true`
+`https://shush.endlesslibrary.com.au/discourse-post-event/events.json?include_details=true`
 and compare the field names.
 
 ## Deploying
