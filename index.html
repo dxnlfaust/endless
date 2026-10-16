@@ -339,6 +339,64 @@
     .pac-track{animation:none!important}
   }
 
+  /* ─────────── gallery popup ─────────── */
+  .gallery-panel{
+    width:min(520px,calc(100vw - 32px));
+    max-height:calc(100svh - 48px);
+    overflow:auto;
+    margin:auto;
+    padding:44px 36px 36px;
+    border:3px solid var(--ink);
+    background:var(--paper);
+    color:var(--ink);
+    text-align:left;
+  }
+  .gallery-panel::backdrop{background:rgba(22,21,15,.45)}
+  .gallery-panel h2{
+    font-family:var(--display);
+    font-weight:400;
+    font-size:clamp(1.5rem,5vw,1.9rem);
+    line-height:1.12;
+    letter-spacing:-.015em;
+    margin:0 0 20px;
+  }
+  .gallery-panel p{
+    font-size:1.08rem;
+    line-height:1.5;
+    margin:0 0 14px;
+  }
+  .gallery-panel a{
+    color:var(--ink);
+    text-decoration-line:underline;
+    text-decoration-color:var(--stamp);
+    text-decoration-thickness:2px;
+    text-underline-offset:3px;
+  }
+  .gallery-panel a:hover,
+  .gallery-panel a:focus-visible{color:var(--stamp)}
+  .gallery-panel .deadline{
+    font-family:var(--util);
+    font-weight:700;
+    font-size:.72rem;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    margin:24px 0 0;
+  }
+  .gallery-close{
+    position:absolute;
+    top:10px;
+    right:12px;
+    font-family:var(--util);
+    font-size:1.5rem;
+    line-height:1;
+    color:var(--ink);
+    background:none;
+    border:0;
+    padding:6px 10px;
+    cursor:pointer;
+  }
+  .gallery-close:hover{color:var(--stamp)}
+
   .ml-nbx .z-10 {
     display: none !important; /* hide the MailerLite badge */
   }
@@ -368,6 +426,7 @@
   <nav class="links rise" aria-label="Sections">
     <a id="link-about" href="#">About</a>
     <a id="list-link" class="ml-onclick-form" href="javascript:void(0)" onclick="ml('show', 'mC9fkp', true)">Subscribe</a>
+    <a id="link-gallery" href="#gallery">Gallery</a>
     <a id="link-forum" href="https://shush.endlesslibrary.com.au">Shush</a>
   </nav>
 
@@ -442,7 +501,33 @@
   <div class="all"><a id="link-all" href="https://shush.endlesslibrary.com.au/upcoming-events">All events on Shush →</a></div>
 </main>
 
+<dialog class="gallery-panel" id="gallery-panel" aria-labelledby="gallery-title">
+  <button class="gallery-close" id="gallery-close" type="button" aria-label="Close">×</button>
+  <h2 id="gallery-title">EOI Open for Endless Gallery January – June 2027 Program</h2>
+  <p>We are starting a library!</p>
+  <p>We are starting a gallery inside the library!</p>
+  <p>We want to show your art!</p>
+  <p>Share with your friends and their friends too!</p>
+  <p>All information and call out form is <a href="https://docs.google.com/forms/d/1Pf4pWBMlLC21YhW0bDH6hEV589Bn4Bi_rAItMo_Z_0I/edit?pli=1" target="_blank" rel="noopener">here</a>.</p>
+  <p class="deadline">Call out closes November 12th</p>
+</dialog>
+
 <script>
+  /* ── Gallery popup ──────────────────────────────────────────────────── */
+  (() => {
+    const panel = document.getElementById('gallery-panel');
+    document.getElementById('link-gallery').addEventListener('click', (e) => {
+      e.preventDefault();
+      panel.showModal();
+    });
+    document.getElementById('gallery-close').addEventListener('click', () => panel.close());
+    // click on the backdrop (outside the panel's box) closes it
+    panel.addEventListener('click', (e) => {
+      const r = panel.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) panel.close();
+    });
+  })();
+
   /* ── Config ─────────────────────────────────────────────────────────── */
   const CONFIG = {
     forum: 'https://shush.endlesslibrary.com.au',
