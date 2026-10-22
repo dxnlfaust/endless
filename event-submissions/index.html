@@ -198,6 +198,8 @@
   .times{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   .times label{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faded)}
 
+  .h-captcha{margin:0 0 30px;min-height:78px}
+
   .submit{
     font-family:var(--util);
     font-weight:400;
@@ -223,6 +225,7 @@
     border:2px solid var(--ink);
   }
   .status:empty{display:none}
+  .status a{color:var(--ink);text-decoration-color:var(--stamp);text-decoration-thickness:2px;text-underline-offset:2px}
 
   .thanks{
     border-top:1px solid var(--rule);
@@ -350,12 +353,15 @@
         <textarea id="anything_else" name="anything_else"></textarea>
       </div>
 
+      <div class="h-captcha" data-captcha="true"></div>
+
       <button class="submit" id="submit-btn" type="submit">Submit</button>
       <p class="status" id="form-status" role="alert"></p>
     </form>
   </div>
 </main>
 
+<script src="https://web3forms.com/client/script.js" async defer></script>
 <script>
   /* Progressive enhancement: without JS the form POSTs to Web3Forms as normal.
      With JS, send via fetch and swap the form for an inline thank-you. */
@@ -369,6 +375,14 @@
       e.preventDefault();
       status.textContent = '';
       status.classList.remove('error');
+
+      const captcha = form.querySelector('textarea[name="h-captcha-response"]');
+      if (captcha && !captcha.value) {
+        status.classList.add('error');
+        status.textContent = 'Please complete the captcha above before submitting.';
+        return;
+      }
+
       btn.disabled = true;
       btn.textContent = 'Sending...';
 
@@ -389,7 +403,8 @@
         wrap.querySelector('.thanks').focus();
       } catch (err) {
         status.classList.add('error');
-        status.textContent = 'Something went wrong sending your proposal. Please try again, or email us directly.';
+        status.innerHTML = 'Something went wrong sending your proposal. Please try again, or email us directly at <a href="mailto:contact@endlesslibrary.com.au">contact@endlesslibrary.com.au</a>.';
+        if (window.hcaptcha) hcaptcha.reset();   // the token is single-use
         btn.disabled = false;
         btn.textContent = 'Submit';
       }
