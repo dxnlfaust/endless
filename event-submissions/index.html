@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event Proposals | Endless Library</title>
+<meta name="description" content="Propose an event, reading group, workshop or hobby club at Endless Library. Fees, facilities and the proposal form.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fff;
+    --ink:#16150f;
+    --stamp:#9B9B98;
+    --faded:#7e7e73;
+    --rule:rgba(22,21,15,.16);
+    --display:"Gloock",Georgia,serif;
+    --body:serif;
+    --util:sans-serif;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-weight:300;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* paper grain — the material, not decoration */
+  .grain{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:50;
+    opacity:.4;
+    mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='.22'/></svg>");
+  }
+
+  /* ─────────── back button ─────────── */
+  .back{
+    position:fixed;
+    top:1rem;
+    left:1rem;
+    z-index:100;
+    display:inline-flex;
+    align-items:center;
+    gap:.5em;
+    min-height:44px;
+    padding:0 20px;
+    font-family:var(--util);
+    font-weight:400;
+    font-size:.72rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--ink);
+    background:var(--paper);
+    border:3px solid rgba(22,21,15,.42);
+    border-radius:999px;
+    text-decoration:none;
+    box-shadow:0 2px 10px rgba(22,21,15,.12);
+    transition:background .18s ease,color .18s ease,border-color .18s ease;
+  }
+  .back:hover,
+  .back:focus-visible{
+    background:var(--stamp);
+    border-color:var(--stamp);
+    color:var(--paper);
+  }
+
+  /* ─────────── page ─────────── */
+  main{
+    max-width:42rem;
+    margin:0 auto;
+    padding:6rem 24px 96px;
+  }
+
+  h1{
+    font-family:var(--display);
+    font-weight:400;
+    font-size:clamp(2rem,7vw,3rem);
+    line-height:1.05;
+    letter-spacing:-.015em;
+    margin:0 0 28px;
+  }
+
+  main p,
+  main li{
+    font-size:1.05rem;
+    line-height:1.55;
+    color:rgba(22,21,15,.86);
+  }
+  main p{margin:0 0 16px}
+  main strong{font-weight:400;color:var(--ink);-webkit-text-stroke:.4px var(--ink)}
+
+  h2{
+    font-family:var(--util);
+    font-weight:700;
+    font-size:.78rem;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    margin:40px 0 12px;
+    padding-top:22px;
+    border-top:1px solid var(--rule);
+  }
+
+  ul{margin:0 0 16px;padding-left:1.2em}
+  li{margin-bottom:8px}
+  li::marker{color:var(--stamp)}
+
+  .intro-end{
+    margin-top:40px;
+    padding-top:22px;
+    border-top:1px solid var(--rule);
+  }
+
+  /* ─────────── form ─────────── */
+  .required-note{
+    font-family:var(--util);
+    font-size:.7rem;
+    letter-spacing:.06em;
+    color:var(--faded);
+    margin:0 0 28px;
+  }
+
+  .field{margin:0 0 30px}
+
+  label,
+  legend{
+    display:block;
+    padding:0;
+    font-family:var(--util);
+    font-weight:400;
+    font-size:.9rem;
+    line-height:1.4;
+    margin-bottom:8px;
+  }
+  .req{color:var(--ink);font-weight:700}
+
+  fieldset{
+    border:0;
+    padding:0;
+    margin:0 0 30px;
+    min-width:0;
+  }
+
+  input[type="email"],
+  input[type="text"],
+  input[type="date"],
+  input[type="time"],
+  textarea{
+    display:block;
+    width:100%;
+    font:inherit;
+    font-family:var(--body);
+    font-weight:400;
+    font-size:1rem;          /* 16px+ stops iOS zooming on focus */
+    line-height:1.4;
+    color:var(--ink);
+    background:var(--paper);
+    border:2px solid rgba(22,21,15,.42);
+    border-radius:0;
+    padding:11px 12px;
+    min-height:44px;
+    appearance:none;
+    -webkit-appearance:none;
+  }
+  textarea{min-height:7.5rem;resize:vertical}
+  input:focus,
+  textarea:focus{
+    border-color:var(--ink);
+    outline:2px solid var(--stamp);
+    outline-offset:2px;
+  }
+
+  .radios{display:flex;flex-wrap:wrap;gap:10px 28px}
+  .radios label{
+    display:inline-flex;
+    align-items:center;
+    gap:.6em;
+    min-height:44px;
+    margin:0;
+    cursor:pointer;
+  }
+  input[type="radio"]{
+    width:1.2rem;
+    height:1.2rem;
+    margin:0;
+    accent-color:var(--ink);
+  }
+
+  .times{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .times label{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faded)}
+
+  .submit{
+    font-family:var(--util);
+    font-weight:400;
+    font-size:.78rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--paper);
+    background:var(--ink);
+    border:3px solid var(--ink);
+    border-radius:999px;
+    min-height:48px;
+    padding:0 34px;
+    cursor:pointer;
+    transition:background .18s ease,border-color .18s ease;
+  }
+  .submit:hover,
+  .submit:focus-visible{background:var(--stamp);border-color:var(--stamp)}
+  .submit:disabled{opacity:.6;cursor:progress}
+
+  .status{margin:18px 0 0;font-family:var(--util);font-size:.9rem;line-height:1.5}
+  .status.error{
+    padding:12px 14px;
+    border:2px solid var(--ink);
+  }
+  .status:empty{display:none}
+
+  .thanks{
+    border-top:1px solid var(--rule);
+    padding-top:22px;
+  }
+  .thanks h2{margin-top:0;padding-top:0;border-top:0}
+  .thanks:focus{outline:none}
+
+  :focus-visible{outline:2px solid var(--stamp);outline-offset:3px}
+
+  @media (max-width:560px){
+    main{padding-top:5.5rem}
+    .times{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<a class="back" href="/"><span aria-hidden="true">←</span> Back</a>
+
+<main>
+  <h1>Event Proposals @ Endless Library</h1>
+
+  <p>Endless Library is open to proposals for <strong>free</strong> or <strong>ticketed</strong> events/reading groups/workshops/hobby clubs/anything else you can think of. We are particularly interested in proposals that respond to the space as a library. The possibilities are endless...</p>
+
+  <p>We want to keep our space as cheap as possible! The costs of running Endless Library are heavily subsidised by a core group of 20 volunteer librarians ("the shush"). The fees for hiring our space are redirected straight back into the Library; no individuals profit.</p>
+
+  <p>Please note that in order to organise an event at Endless, you will need to <strong>become a member</strong> ($10/month or $100/year; more info on this soon).</p>
+
+  <h2>Fees:</h2>
+  <ul>
+    <li>Events with tickets that cost $5 or less: $50 hire fee</li>
+    <li>Events with tickets that cost more than $5: $100 hire fee, or 20% of ticket proceeds, whichever is higher</li>
+    <li>If your event goes for longer than 4h, these fees may increase</li>
+    <li>Small-scale (~8pp) events that occur during Library opening hours (Saturday &amp; Sunday 9am-6pm) incur no hire fee</li>
+  </ul>
+
+  <h2>The Library &amp; facilities</h2>
+  <ul>
+    <li>1/292 Marrickville Road, accessed via Marrickville Lane</li>
+    <li>Is not wheelchair accessible; 2 flights of stairs to access the space</li>
+    <li>Consists of two rooms: a larger Library and a smaller Gallery. Both have windows.</li>
+    <li>The larger Library has a capacity of around 50 people. The smaller gallery has a capacity of around 20 people</li>
+    <li>There is a kitchen equipped with stove, oven, sink and bench space for cooking</li>
+    <li>Has a projector and screen for film screenings</li>
+    <li>Has seating (fold-out chairs; stools and couches) for around 50 people, and a few tables</li>
+    <li>Has a small PA</li>
+  </ul>
+
+  <h2>Please note</h2>
+  <ul>
+    <li>If your event features tech such as music gear, you will need to have a person responsible for setting up, tuning and troubleshooting the soundsystem</li>
+    <li>You will be responsible for promoting, ticketing and communicating around your event</li>
+    <li>Endless will ordinarily also share information about your event in our newsletter and monthly calendar</li>
+  </ul>
+
+  <p class="intro-end">Your proposal will be reviewed by members of the Shush and you will receive an answer within 4 weeks.</p>
+
+  <div id="form-wrap">
+    <p class="required-note">* Indicates required question</p>
+
+    <form id="proposal-form" action="https://api.web3forms.com/submit" method="POST">
+      <input type="hidden" name="access_key" value="f9ed07b2-c131-4ff5-882f-1e4bc574a7f6">
+      <input type="hidden" name="subject" value="New event proposal - Endless Library">
+      <input type="hidden" name="from_name" value="Endless Library website">
+      <!-- Honeypot: must stay empty. Hidden from humans, bots tend to fill it in. -->
+      <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+
+      <div class="field">
+        <label for="email">Email <span class="req" aria-hidden="true">*</span></label>
+        <input type="email" id="email" name="email" autocomplete="email" required>
+      </div>
+
+      <div class="field">
+        <label for="proposal">Briefly, what is your proposal?</label>
+        <textarea id="proposal" name="proposal"></textarea>
+      </div>
+
+      <fieldset>
+        <legend>Is your proposal:</legend>
+        <div class="radios">
+          <label><input type="radio" name="proposal_type" value="Free"> Free</label>
+          <label><input type="radio" name="proposal_type" value="Ticketed"> Ticketed</label>
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label for="expected_attendees">How many attendees do you expect?</label>
+        <input type="text" id="expected_attendees" name="expected_attendees" inputmode="numeric" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="participants">Who are the artists / speakers / participants?</label>
+        <textarea id="participants" name="participants"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="event_date">When do you intend the event to take place?</label>
+        <input type="date" id="event_date" name="event_date">
+      </div>
+
+      <fieldset>
+        <legend>What times will the event start/finish?</legend>
+        <div class="times">
+          <div>
+            <label for="start_time">Start</label>
+            <input type="time" id="start_time" name="start_time">
+          </div>
+          <div>
+            <label for="end_time">Finish</label>
+            <input type="time" id="end_time" name="end_time">
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label for="support_requested">How do you want Endless to support your proposal?</label>
+        <textarea id="support_requested" name="support_requested"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="anything_else">Is there anything else you want to tell us?</label>
+        <textarea id="anything_else" name="anything_else"></textarea>
+      </div>
+
+      <button class="submit" id="submit-btn" type="submit">Submit</button>
+      <p class="status" id="form-status" role="alert"></p>
+    </form>
+  </div>
+</main>
+
+<script>
+  /* Progressive enhancement: without JS the form POSTs to Web3Forms as normal.
+     With JS, send via fetch and swap the form for an inline thank-you. */
+  (() => {
+    const form = document.getElementById('proposal-form');
+    const wrap = document.getElementById('form-wrap');
+    const btn = document.getElementById('submit-btn');
+    const status = document.getElementById('form-status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.textContent = '';
+      status.classList.remove('error');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: new FormData(form)
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Submission failed');
+
+        wrap.innerHTML =
+          '<div class="thanks" role="status" tabindex="-1">' +
+          '<h2>Thanks!</h2>' +
+          '<p>Your proposal has been sent. You’ll hear back from the Shush within 4 weeks.</p>' +
+          '</div>';
+        wrap.querySelector('.thanks').focus();
+      } catch (err) {
+        status.classList.add('error');
+        status.textContent = 'Something went wrong sending your proposal. Please try again, or email us directly.';
+        btn.disabled = false;
+        btn.textContent = 'Submit';
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>
