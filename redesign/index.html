@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Endless Library</title>
+<meta name="description" content="Endless Library is an independent library and community activity space in Marrickville, Sydney.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..600&display=swap" rel="stylesheet">
+<link rel="preload" href="assets/Belledejour.ttf" as="font" type="font/ttf" crossorigin>
+<style>
+  /* ─────────── fonts ───────────
+     Belledejour: nav, poem, intro text, headings, acknowledgement.
+     It has letters and quotes only (no digits or most punctuation), so
+     anything with numbers — hours, dates, times — is set in the sans.
+     Archivo stands in for the design's Acumin Variable Concept.        */
+  @font-face{
+    font-family:"Belledejour";
+    src:url("assets/Belledejour.ttf") format("truetype");
+    font-weight:400;
+    font-style:normal;
+    font-display:swap;
+  }
+
+  :root{
+    --blue:#1a63ff;
+    --green:#1a7935;
+    --red:#ff3b3b;
+    --rule:#ff1f1f;
+    --ink:#111;
+    --paper:#fff;
+    --tone:#f2f1ee;                 /* the paper colour the texture layer multiplies in */
+    --script:"Belledejour", Georgia, serif;
+    --sans:"Archivo", "Helvetica Neue", Arial, sans-serif;
+    --t:14px;                       /* the one size every sans text uses */
+    --tl:17px;                      /* ...and its line height */
+    --ack-h:44px;
+    --nav-h:clamp(92px, 13svh, 132px);
+    --pad:20px;                     /* shared left/right gutter: logo, sidebar, nav, poem */
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:var(--t);
+    line-height:var(--tl);
+    font-variation-settings:"wdth" 92;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit}
+
+  /* ─────────── texture ───────────
+     Stands in for the Webflow noise + paper-scan layers: one fixed sheet,
+     multiplied over everything, tinting white to paper and adding grain. */
+  .texture{
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    pointer-events:none;
+    mix-blend-mode:multiply;
+    background-color:var(--tone);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -1.1 1.05'/></filter><rect width='220' height='220' filter='url(%23n)'/></svg>");
+    opacity:.95;
+  }
+
+  /* ─────────── nav ─────────── */
+  /* The header is built on the page's own columns: the logo sits over the
+     sidebar and the four links sit over the four poem columns, so every
+     left edge lines up with the text below it. Logo height is a fixed
+     share of the bar, so top and bottom space stay equal at any size.   */
+  .nav-bar{
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:10;
+    width:100%;
+    height:var(--nav-h);
+    display:flex;
+    align-items:center;
+  }
+  .logo{
+    flex:none;
+    width:30vw;
+    padding:0 var(--pad);
+    display:flex;
+    align-items:center;
+  }
+  .logo img{
+    display:block;
+    height:calc(var(--nav-h) * .56);
+    width:auto;
+    max-width:100%;
+    object-fit:contain;
+    object-position:left center;
+    mix-blend-mode:multiply;
+  }
+  .nav-links{
+    flex:1;
+    min-width:0;
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:16px;
+    padding:0 var(--pad);
+  }
+  .nav-link{
+    justify-self:start;
+    color:var(--blue);
+    font-family:var(--script);
+    font-size:clamp(21px, 2.1vw, 30px);
+    line-height:1.1;
+    text-decoration:none;
+    margin:0 0 0 10px;
+    background:none;
+    border:0;
+    padding:0;
+    cursor:pointer;
+    transition:color .2s, box-shadow .2s;
+  }
+  .nav-link:hover,
+  .nav-link:focus-visible{
+    color:var(--green);
+    box-shadow:0 2px var(--green);
+    outline:none;
+  }
+  .menu-toggle{display:none}
+
+  /* mobile menu: blue panel that slides in from the right */
+  .mobile-menu{
+    position:fixed;
+    inset:0;
+    z-index:150;
+    display:flex;
+    justify-content:flex-end;
+    pointer-events:none;
+    visibility:hidden;
+    transition:visibility 0s .55s;
+  }
+  .mobile-menu .scrim{flex:1}
+  .mobile-menu .panel{
+    width:70vw;
+    height:100%;
+    background:var(--blue);
+    display:flex;
+    flex-direction:column;
+    padding:146px 39px 39px;
+    transform:translateX(100%);
+    transition:transform .55s cubic-bezier(.65,0,.35,1);
+  }
+  .mobile-menu.open{
+    pointer-events:auto;
+    visibility:visible;
+    transition:visibility 0s 0s;
+  }
+  .mobile-menu.open .panel{transform:none}
+  .mobile-menu .nav-link{
+    color:#fff;
+    font-size:38px;
+    margin:0 0 3vh;
+    align-self:flex-start;
+    text-align:left;
+  }
+  .mobile-menu .nav-link:hover,
+  .mobile-menu .nav-link:focus-visible{color:#fff;box-shadow:0 2px #fff}
+  .menu-close{
+    position:absolute;
+    top:30px;
+    right:28px;
+    width:44px;
+    height:44px;
+    background:none;
+    border:0;
+    cursor:pointer;
+    padding:0;
+  }
+  .menu-close::before,
+  .menu-close::after{
+    content:"";
+    position:absolute;
+    top:50%;
+    left:6px;
+    right:6px;
+    height:3px;
+    background:#fff;
+  }
+  .menu-close::before{transform:rotate(45deg)}
+  .menu-close::after{transform:rotate(-45deg)}
+
+  /* ─────────── the page that the footer scrolls up over ─────────── */
+  .page{
+    position:sticky;
+    top:0;
+    z-index:0;
+    height:100vh;
+    height:100svh;
+    padding-bottom:var(--ack-h);
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+  }
+  .line-panel{
+    position:relative;
+    height:6px;
+    border-top:1.5px solid var(--rule);
+    border-bottom:1.5px solid var(--rule);
+  }
+  .body-panel{
+    display:flex;
+    height:calc(100svh - var(--ack-h) - var(--nav-h) - 6px);
+    border:2px solid transparent;
+  }
+  .sidebar{
+    width:30vw;
+    flex:none;
+    height:100%;
+    border-right:2px solid var(--rule);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:var(--pad);
+  }
+  .intro-text{
+    font-family:var(--sans);
+    font-weight:400;
+    font-size:var(--t);
+    line-height:var(--tl);
+    margin:0;
+    max-width:15em;
+  }
+  .sidebar-art{
+    flex:1 1 0;
+    min-height:0;
+    width:100%;
+    margin:12px 0;
+    object-fit:contain;
+    object-position:center;
+    mix-blend-mode:multiply;
+    pointer-events:none;
+    user-select:none;
+  }
+  .details{
+    font-size:var(--t);
+    line-height:var(--tl);
+    margin:0;
+  }
+  .details a{color:var(--ink)}
+  .text-link{
+    text-decoration:underline;
+    text-underline-offset:2px;
+    background:none;
+    border:0;
+    padding:0;
+    font:inherit;
+    color:inherit;
+    text-align:left;
+    cursor:pointer;
+  }
+  .text-link:hover{color:var(--green)}
+
+  .page-content{
+    position:relative;
+    flex:1;
+    min-width:0;
+    overflow:hidden;
+  }
+
+  /* ─────────── poem ───────────
+     A grid of dots. Hover a dot and its word fades in beside it; hover
+     the little glyph in the corner and the whole poem appears at once. */
+  .page-content{container-type:inline-size}
+  .poem{
+    /* Each word's size is worked out from its column width (container query
+       units), so the longest word always fits whatever the screen.
+       --r is the widest word ("libraries") in em, measured in Belledejour. */
+    --cols:4;
+    --gap:16px;
+    --padl:var(--pad);
+    --padr:var(--pad);
+    --wpad:10px;
+    --dotw:20px;
+    --r:3.1;
+    --fs-max:30px;
+    display:grid;
+    grid-template-columns:repeat(var(--cols), minmax(0, 1fr));
+    grid-template-rows:repeat(4, 1fr);
+    gap:var(--gap);
+    height:100%;
+    padding:var(--pad) var(--padr) var(--pad) var(--padl);
+    margin:0;
+    list-style:none;
+  }
+  .word{
+    display:flex;
+    align-items:baseline;
+    padding:0 var(--wpad);
+    color:var(--red);
+    white-space:nowrap;
+    font-size:22px;
+    font-size:min(var(--fs-max), calc(((100cqi - var(--padl) - var(--padr) - (var(--cols) - 1) * var(--gap)) / var(--cols) - 2 * var(--wpad) - var(--dotw)) / var(--r)));
+  }
+  .dot{
+    font-family:var(--sans);
+    font-size:var(--t);
+    width:var(--dotw);
+    flex:none;
+    cursor:default;
+    transition:opacity .5s ease;
+  }
+  .dot::before{content:"\2022"}
+  .w{
+    font-family:var(--script);
+    opacity:0;
+    transition:opacity .6s cubic-bezier(.33,1,.68,1);
+    transition-delay:0s;
+  }
+  .word.on .w{opacity:1}
+  @media (hover:hover){ .word:hover .w{opacity:1} }
+  .poem.reveal .w{opacity:1;transition-delay:calc(var(--i) * 35ms)}
+  .poem.reveal .dot{opacity:0}
+
+  .poem-reveal{
+    position:absolute;
+    right: 7px;
+    bottom: 59px;
+    width:30px;
+    height:32px;
+    padding:0;
+    border:0;
+    background:url("assets/poem-reveal.png") center/contain no-repeat;
+    mix-blend-mode:multiply;
+    cursor:pointer;
+  }
+
+  /* ─────────── acknowledgement bar (fixed while the page is in view) ─────────── */
+  .ack{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:100;
+    height:var(--ack-h);
+    display:flex;
+    align-items:center;
+    padding:5px var(--pad);
+    background:var(--paper);
+    border-top:1.5px solid var(--rule);
+    color:var(--red);
+    font-family:var(--sans);
+    font-size:var(--t);
+    line-height:var(--tl);
+    margin:0;
+  }
+
+  /* ─────────── footer: scrolls up over the page ─────────── */
+  .footer{
+    position:relative;
+    z-index:2;
+    display:flex;
+    min-height:330px;
+    padding-bottom:var(--ack-h);
+    background:var(--paper);
+    border-top:1.5px solid var(--rule);
+  }
+  .footer .ack{position:absolute}
+  .footer-info{
+    width:30vw;
+    flex:none;
+    padding:var(--pad);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  }
+  .footer-title{
+    font-family:var(--script);
+    font-weight:400;
+    font-size:25px;
+    line-height:1.1;
+    margin:0;
+  }
+  .events-wrap{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    padding:20px 0 0;
+  }
+  .events-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:16px;
+    padding:0 var(--pad) 14px;
+  }
+  .events-head h2{
+    font-family:var(--script);
+    font-weight:400;
+    font-size:32px;
+    line-height:1.1;
+    color:var(--red);
+    margin:0;
+  }
+  .events-head a{
+    font-size:var(--t);
+    line-height:var(--tl);
+    color:var(--ink);
+    text-underline-offset:2px;
+    white-space:nowrap;
+  }
+  .events-head a:hover{color:var(--green)}
+
+  /* the horizontal row */
+  .events{
+    flex:1;
+    display:flex;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    scrollbar-width:thin;
+    scrollbar-color:var(--rule) transparent;
+    padding:0 0 18px;
+    margin:0;
+    list-style:none;
+  }
+  .event{
+    flex:0 0 clamp(220px, 17.5vw, 320px);
+    scroll-snap-align:start;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    padding:2px var(--pad) 4px;
+    border-left:1.5px solid var(--rule);
+    opacity:0;
+    transform:translateY(14px);
+    transition:opacity .6s ease, transform .6s cubic-bezier(.33,1,.68,1);
+    transition-delay:calc(var(--i, 0) * 80ms);
+  }
+  .event:first-child{border-left:0}
+  .footer.seen .event{opacity:1;transform:none}
+  .event .when{
+    font-size:var(--t);
+    line-height:var(--tl);
+    letter-spacing:.02em;
+    color:var(--blue);
+    margin:0;
+  }
+  .event h3{
+    font-family:var(--sans);
+    font-weight:500;
+    font-size:var(--t);
+    line-height:var(--tl);
+    margin:0;
+  }
+  .event h3 a{
+    text-decoration:none;
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:3;
+    overflow:hidden;
+  }
+  .event h3 a:hover{color:var(--green);text-decoration:underline;text-underline-offset:2px}
+  .event .meta,
+  .event .note{
+    font-size:var(--t);
+    line-height:var(--tl);
+    margin:0;
+  }
+  .event .note{
+    color:#555;
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:3;
+    overflow:hidden;
+  }
+  .event .meta a{text-underline-offset:2px}
+  .event .meta a:hover{color:var(--green)}
+  .events-empty{
+    padding:0 var(--pad);
+    font-size:var(--t);
+    line-height:var(--tl);
+    max-width:36em;
+  }
+
+  /* ─────────── gallery popup ─────────── */
+  .gallery-panel{
+    width:min(520px, calc(100vw - 32px));
+    max-height:calc(100svh - 48px);
+    overflow:auto;
+    margin:auto;
+    padding:44px 32px 32px;
+    border:1.5px solid var(--rule);
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .gallery-panel::backdrop{background:rgba(17,17,17,.35)}
+  .gallery-panel h2{
+    font-family:var(--sans);
+    font-weight:500;
+    font-size:var(--t);
+    line-height:var(--tl);
+    margin:0 0 18px;
+    color:var(--red);
+  }
+  .gallery-panel p{font-size:var(--t);line-height:var(--tl);margin:0 0 12px}
+  .gallery-panel a:hover{color:var(--green)}
+  .gallery-panel .deadline{
+    font-size:var(--t);
+    font-weight:600;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--blue);
+    margin:22px 0 0;
+  }
+  .gallery-close{
+    position:absolute;
+    top:10px;
+    right:12px;
+    font:400 28px/1 var(--sans);
+    color:var(--red);
+    background:none;
+    border:0;
+    padding:4px 10px;
+    cursor:pointer;
+  }
+
+  .sr-only{
+    position:absolute;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+    clip:rect(0 0 0 0);
+    white-space:nowrap;
+  }
+
+  .ml-nbx .z-10{display:none !important}   /* hide the MailerLite badge */
+
+  /* ─────────── tablet ─────────── */
+  @media (max-width:991px){
+    :root{--ack-h:52px;--nav-h:84px}
+    .nav-links{display:none}
+    .menu-toggle{display:block;margin:0 var(--pad) 0 auto;font-size:34px}
+    .logo{width:auto}
+    .sidebar,.footer-info{width:38vw}
+    .poem{--gap:8px;--wpad:6px;--padl:12px;--padr:12px;--fs-max:26px}
+  }
+
+  /* ─────────── phone ───────────
+     The poem becomes a single column of 16 lines, so each word has the
+     full column to itself instead of a sliver. Size also respects the
+     screen height so all 16 lines fit without scrolling.               */
+  @media (max-width:767px){
+    :root{--ack-h:66px;--pad:16px}
+    .sidebar{display:none}
+    .poem{
+      --cols:2;
+      --gap:12px;
+      --wpad:4px;
+      --dotw:16px;
+      --padl:var(--pad);
+      --padr:var(--pad);
+      --fs-max:26px;
+      grid-template-rows:repeat(8, 1fr);
+      row-gap:0;
+      padding-top:16px;
+      padding-bottom:16px;
+    }
+    .word{align-items:center}
+    .footer{flex-direction:column-reverse;min-height:0}
+    .footer-info{width:auto;border-right:0;border-top:1.5px solid var(--rule);gap:24px}
+    .events-head{padding:0 var(--pad) 12px}
+    .event{flex-basis:78vw;padding:2px var(--pad) 4px}
+  }
+  @media (max-width:479px){
+    :root{--nav-h:72px}
+  }
+  @media (max-width:359px){
+    :root{--ack-h:86px}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition-duration:0s !important;transition-delay:0s !important}
+    .event{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="texture" aria-hidden="true"></div>
+
+<header class="nav-bar">
+  <a class="logo" href="/" aria-label="Endless Library, home">
+    <img src="assets/logo.png" width="500" height="125" alt="Endless Library">
+  </a>
+  <nav class="nav-links" aria-label="Sections">
+    <a class="nav-link js-calendar" href="#footer">Calendar</a>
+    <a class="nav-link js-gallery" href="#gallery">Gallery</a>
+    <a class="nav-link" href="/event-submissions">Events EOI</a>
+    <a class="nav-link js-forum" href="https://shush.endlesslibrary.com.au">log in to Shush</a>
+  </nav>
+  <button class="nav-link menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
+</header>
+
+<div class="mobile-menu" id="mobile-menu">
+  <div class="scrim"></div>
+  <nav class="panel" aria-label="Sections">
+    <button class="menu-close" type="button"><span class="sr-only">Close menu</span></button>
+    <a class="nav-link js-calendar" href="#footer">Calendar</a>
+    <a class="nav-link js-gallery" href="#gallery">Gallery</a>
+    <a class="nav-link" href="/event-submissions">Events EOI</a>
+    <a class="nav-link js-subscribe" href="#subscribe">Subscribe</a>
+    <a class="nav-link js-forum" href="https://shush.endlesslibrary.com.au">Shush</a>
+  </nav>
+</div>
+
+<main class="page">
+  <div class="line-panel" aria-hidden="true"></div>
+  <div class="body-panel">
+    <aside class="sidebar">
+      <h1 class="intro-text">Endless Library is an independent library and community activity space.</h1>
+      <img class="sidebar-art" src="assets/sidebar.png" width="1024" height="1280" alt="" aria-hidden="true">
+      <p class="details">
+        Open Saturday and Sunday, 10am – 6pm<br>
+        1/192 Marrickville Road, Marrickville. Sydney<br><br>
+        <button class="text-link js-subscribe" type="button">Sign up to our newsletter</button>
+      </p>
+    </aside>
+
+    <div class="page-content">
+      <p class="sr-only">There are other libraries they have not told you of; they wish to speak to you.</p>
+      <ul class="poem" id="poem" aria-hidden="true"></ul>
+      <button class="poem-reveal" type="button" id="poem-reveal" aria-label="Reveal the poem"></button>
+    </div>
+  </div>
+</main>
+
+<p class="ack" aria-hidden="true">Endless Library Acknowledges the Wangal and Gadigal people of the Eora Nation as the traditional custodians of the Land on which we meet</p>
+
+<footer class="footer" id="footer">
+  <div class="footer-info">
+    <p class="details">
+      Open Saturday and Sunday, 10am – 6pm<br>
+      1/192 Marrickville Road, Marrickville. Sydney<br><br>
+      <button class="text-link js-subscribe" type="button">Sign up to our newsletter</button><br>
+      <a href="mailto:contact@endlesslibrary.com.au">contact@endlesslibrary.com.au</a>
+    </p>
+  </div>
+
+  <section class="events-wrap" aria-labelledby="events-title">
+    <div class="events-head">
+      <h2 id="events-title">Upcoming events</h2>
+      <a class="js-all-events" href="https://shush.endlesslibrary.com.au/upcoming-events">All events on Shush →</a>
+    </div>
+    <ul class="events" id="events">
+      <li class="events-empty">Loading events…</li>
+    </ul>
+  </section>
+
+  <p class="ack">Endless Library Acknowledges the Wangal and Gadigal people of the Eora Nation as the traditional custodians of the Land on which we meet</p>
+</footer>
+
+<dialog class="gallery-panel" id="gallery-panel" aria-labelledby="gallery-title">
+  <button class="gallery-close" id="gallery-close" type="button" aria-label="Close">×</button>
+  <h2 id="gallery-title">EOI Open for Endless Gallery January – June 2027 Program</h2>
+  <p>We are starting a library!</p>
+  <p>We are starting a gallery inside the library!</p>
+  <p>We want to show your art!</p>
+  <p>Share with your friends and their friends too!</p>
+  <p>All information and call out form is <a href="https://docs.google.com/forms/d/1Pf4pWBMlLC21YhW0bDH6hEV589Bn4Bi_rAItMo_Z_0I/edit?pli=1" target="_blank" rel="noopener">here</a>.</p>
+  <p class="deadline">Call out closes November 12th</p>
+</dialog>
+
+<script>
+  /* ── Config ─────────────────────────────────────────────────────────── */
+  const CONFIG = {
+    forum: 'https://shush.endlesslibrary.com.au',
+    limit: 10,                      // events shown in the footer row
+    timeZone: 'Australia/Sydney',   // show times as library time, wherever the visitor is
+    mailerliteForm: 'mC9fkp'
+  };
+
+  const POEM = 'There are other libraries they have not told you of they wish to speak to you';
+
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+
+  $$('.js-forum').forEach(a => { a.href = CONFIG.forum; });
+  $$('.js-all-events').forEach(a => { a.href = CONFIG.forum + '/upcoming-events'; });
+
+  /* ── Poem grid ──────────────────────────────────────────────────────── */
+  const poem = $('#poem');
+  POEM.split(' ').forEach((word, i) => {
+    const li = document.createElement('li');
+    li.className = 'word';
+    li.style.setProperty('--i', i);
+    li.innerHTML = '<span class="dot"></span><span class="w"></span>';
+    li.querySelector('.w').textContent = word;
+    // touch screens have no hover: a tap toggles the word instead
+    li.addEventListener('click', () => li.classList.toggle('on'));
+    poem.appendChild(li);
+  });
+
+  const revealBtn = $('#poem-reveal');
+  const showPoem = on => poem.classList.toggle('reveal', on);
+  revealBtn.addEventListener('mouseenter', () => showPoem(true));
+  revealBtn.addEventListener('mouseleave', () => showPoem(false));
+  revealBtn.addEventListener('focus', () => showPoem(true));
+  revealBtn.addEventListener('blur', () => showPoem(false));
+  revealBtn.addEventListener('click', () => {
+    if (matchMedia('(hover:none)').matches) showPoem(!poem.classList.contains('reveal'));
+  });
+
+  /* ── Calendar ───────────────────────────────────────────────────────────
+     Slides the footer up over the page so the events row is in view.     */
+  $$('.js-calendar').forEach(a => a.addEventListener('click', e => {
+    e.preventDefault();
+    closeMenu();
+    $('#footer').scrollIntoView({
+      behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'auto' : 'smooth',
+      block: 'start'
+    });
+  }));
+
+  /* ── Gallery popup ──────────────────────────────────────────────────── */
+  const gallery = $('#gallery-panel');
+  $$('.js-gallery').forEach(a => a.addEventListener('click', e => {
+    e.preventDefault();
+    closeMenu();
+    gallery.showModal();
+  }));
+  $('#gallery-close').addEventListener('click', () => gallery.close());
+  gallery.addEventListener('click', e => {
+    const r = gallery.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) gallery.close();
+  });
+
+  /* ── Subscribe (MailerLite popup) ───────────────────────────────────── */
+  $$('.js-subscribe').forEach(el => el.addEventListener('click', e => {
+    e.preventDefault();
+    closeMenu();
+    if (typeof window.ml === 'function') window.ml('show', CONFIG.mailerliteForm, true);
+  }));
+
+  /* ── Mobile menu ────────────────────────────────────────────────────── */
+  const menu = $('#mobile-menu');
+  const toggle = $('.menu-toggle');
+  function openMenu() {
+    menu.classList.add('open');
+    toggle.setAttribute('aria-expanded', 'true');
+    setTimeout(() => $('.menu-close').focus(), 50);
+  }
+  function closeMenu() {
+    if (!menu.classList.contains('open')) return;
+    menu.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+  toggle.addEventListener('click', openMenu);
+  $('.menu-close').addEventListener('click', closeMenu);
+  $('.scrim').addEventListener('click', closeMenu);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
+  /* ── Events: formatting helpers ─────────────────────────────────────── */
+  const fmt = opts => new Intl.DateTimeFormat('en-AU', { timeZone: CONFIG.timeZone, ...opts });
+  const DAY = fmt({ weekday: 'short', day: 'numeric', month: 'long' });
+  const DATEKEY = fmt({ year: 'numeric', month: '2-digit', day: '2-digit' });
+  const CLOCK = fmt({ hour: 'numeric', minute: '2-digit', hour12: true });
+
+  function clockTime(date) {
+    return CLOCK.format(date).replace(':00', '').replace(/\s?(am|pm)/i, (m, p) => p.toLowerCase());
+  }
+  function timeRange(start, end) {
+    if (!end) return clockTime(start);
+    return DATEKEY.format(start) === DATEKEY.format(end)
+      ? clockTime(start) + '–' + clockTime(end)
+      : clockTime(start) + ' until ' + DAY.format(end);
+  }
+  function stripHtml(html) {
+    if (!html) return '';
+    const el = document.createElement('div');
+    el.innerHTML = html;
+    return (el.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+  function truncate(text, max) {
+    return text.length > max ? text.slice(0, max).replace(/\s\S*$/, '') + '…' : text;
+  }
+  function absolute(path) {
+    if (!path) return CONFIG.forum + '/upcoming-events';
+    try { return new URL(path, CONFIG.forum).href; } catch { return CONFIG.forum; }
+  }
+  /* Pull the first URL out of the location so it renders as a link. */
+  function extractLink(text) {
+    const match = text.match(/https?:\/\/\S+/i);
+    if (!match) return { text, link: null };
+    const url = match[0].replace(/[.,;:)\]]+$/, '');
+    const rest = (text.slice(0, match.index) + text.slice(match.index + match[0].length)).replace(/\s+/g, ' ').trim();
+    const lower = url.toLowerCase();
+    const label = lower.includes('rsvp') ? 'RSVP here' : lower.includes('humanitix') ? 'Tickets' : 'Details';
+    return { text: rest, link: { url, label } };
+  }
+
+  /* ── Map one Discourse event to what the page needs ─────────────────────
+     Field names come from the discourse-post-event serializer
+     (<forum>/discourse-post-event/events.json?include_details=true).    */
+  function normalise(raw) {
+    const start = new Date(raw.starts_at);
+    if (isNaN(start)) return null;
+    const end = raw.ends_at ? new Date(raw.ends_at) : null;
+    const topic = (raw.post && raw.post.topic) || {};
+    const loc = extractLink(raw.location || '');
+    // descriptions often carry the ticket / RSVP link; surface it, keep the words
+    const desc = extractLink(stripHtml(raw.description || ''));
+    const note = desc.text.replace(/https?:\/\/\S+/g, '').replace(/\s+/g, ' ').trim();
+    return {
+      start,
+      end,
+      allDay: !!raw.all_day,
+      title: raw.name || topic.title || 'Untitled event',
+      url: absolute(raw.post && raw.post.url),
+      locationText: loc.text,
+      locationLink: loc.link || desc.link,
+      note: truncate(note, 110)
+    };
+  }
+
+  /* ── Render ─────────────────────────────────────────────────────────── */
+  const list = $('#events');
+
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  function render(events) {
+    list.textContent = '';
+    events.forEach((ev, i) => {
+      const li = el('li', 'event');
+      li.style.setProperty('--i', i);
+
+      li.appendChild(el('p', 'when', DAY.format(ev.start)));
+
+      const h3 = el('h3');
+      const a = el('a', null, ev.title);
+      a.href = ev.url;
+      h3.appendChild(a);
+      li.appendChild(h3);
+
+      const meta = el('p', 'meta');
+      const parts = [ev.allDay ? 'All day' : timeRange(ev.start, ev.end)];
+      if (ev.locationText) parts.push(ev.locationText);
+      meta.textContent = parts.join(' · ');
+      if (ev.locationLink) {
+        meta.appendChild(document.createTextNode(' · '));
+        const l = el('a', null, ev.locationLink.label);
+        l.href = ev.locationLink.url;
+        l.target = '_blank';
+        l.rel = 'noopener';
+        meta.appendChild(l);
+      }
+      li.appendChild(meta);
+
+      if (ev.note) li.appendChild(el('p', 'note', ev.note));
+      list.appendChild(li);
+    });
+  }
+
+  function renderMessage(html) {
+    list.innerHTML = '<li class="events-empty">' + html + '</li>';
+  }
+
+  async function loadEvents() {
+    const url = CONFIG.forum + '/discourse-post-event/events.json?include_details=true&limit=50';
+    try {
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const now = Date.now();
+      const events = (data.events || [])
+        .map(normalise)
+        .filter(ev => ev && (ev.end || ev.start).getTime() >= now)
+        .sort((a, b) => a.start - b.start)
+        .slice(0, CONFIG.limit);
+      if (events.length) render(events);
+      else renderMessage('Nothing on the calendar just now. New dates go up on <a href="' + CONFIG.forum + '/upcoming-events">Shush</a> first.');
+    } catch (err) {
+      console.warn('[endless library] could not load events:', err.message);
+      renderMessage('Events couldn’t load here. See what’s on at <a href="' + CONFIG.forum + '/upcoming-events">Shush</a>.');
+    }
+  }
+
+  /* fade the event row in as the footer scrolls up into view */
+  const footer = $('#footer');
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries, obs) => {
+      if (entries.some(e => e.isIntersecting)) { footer.classList.add('seen'); obs.disconnect(); }
+    }, { threshold: 0.25 }).observe(footer);
+  } else {
+    footer.classList.add('seen');
+  }
+
+  loadEvents();
+</script>
+
+<!-- MailerLite Universal -->
+<script>
+  (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
+  .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
+  n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
+  (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+  ml('account', '2535543');
+</script>
+<!-- End MailerLite Universal -->
+</body>
+</html>
