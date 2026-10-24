@@ -7,146 +7,181 @@
 <meta name="description" content="Propose an event, reading group, workshop or hobby club at Endless Library. Fees, facilities and the proposal form.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..600&display=swap" rel="stylesheet">
+<link rel="preload" href="/assets/Belledejour.ttf" as="font" type="font/ttf" crossorigin>
 <style>
+  /* Same look as the home page: Belledejour for the nav and headings, Archivo
+     at one size for body text, red rules, paper texture. Belledejour has no
+     digits, @ or &, so those sit in .sans spans.  Form fields are 16px
+     because smaller text makes iOS zoom the page on focus.                */
+  @font-face{
+    font-family:"Belledejour";
+    src:url("/assets/Belledejour.ttf") format("truetype");
+    font-weight:400;
+    font-style:normal;
+    font-display:swap;
+  }
+
   :root{
+    --blue:#1a63ff;
+    --green:#1a7935;
+    --red:#ff3b3b;
+    --rule:#ff1f1f;
+    --ink:#111;
     --paper:#fff;
-    --ink:#16150f;
-    --stamp:#9B9B98;
-    --faded:#7e7e73;
-    --rule:rgba(22,21,15,.16);
-    --display:"Gloock",Georgia,serif;
-    --body:serif;
-    --util:sans-serif;
+    --tone:#f2f1ee;
+    --script:"Belledejour", Georgia, serif;
+    --sans:"Archivo", "Helvetica Neue", Arial, sans-serif;
+    --t:14px;
+    --tl:17px;
+    --pad:20px;
+    --bar-h:84px;
   }
 
   *{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-
+  html{-webkit-text-size-adjust:100%}
   body{
     margin:0;
     background:var(--paper);
     color:var(--ink);
-    font-family:var(--body);
-    font-weight:300;
+    font-family:var(--sans);
+    font-size:var(--t);
+    line-height:var(--tl);
+    font-variation-settings:"wdth" 92;
     -webkit-font-smoothing:antialiased;
   }
+  a{color:inherit}
+  .sans{font-family:var(--sans)}
 
-  /* paper grain — the material, not decoration */
-  .grain{
+  .texture{
     position:fixed;
     inset:0;
+    z-index:1000;
     pointer-events:none;
-    z-index:50;
-    opacity:.4;
     mix-blend-mode:multiply;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='.22'/></svg>");
+    background-color:var(--tone);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -1.1 1.05'/></filter><rect width='220' height='220' filter='url(%23n)'/></svg>");
+    opacity:.95;
   }
 
-  /* ─────────── back button ─────────── */
-  .back{
+  /* ─────────── fixed header: Back top-left, logo top-right ─────────── */
+  .bar{
     position:fixed;
-    top:1rem;
-    left:1rem;
+    top:0;
+    left:0;
+    right:0;
     z-index:100;
+    height:var(--bar-h);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 var(--pad);
+    background:var(--paper);
+  }
+  .bar::after{                       /* the home page's double red rule */
+    content:"";
+    position:absolute;
+    left:0;
+    right:0;
+    top:100%;
+    height:6px;
+    background:var(--paper);
+    border-top:1.5px solid var(--rule);
+    border-bottom:1.5px solid var(--rule);
+  }
+  .back{
     display:inline-flex;
     align-items:center;
-    gap:.5em;
+    gap:.45em;
     min-height:44px;
-    padding:0 20px;
-    font-family:var(--util);
-    font-weight:400;
-    font-size:.72rem;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    color:var(--ink);
-    background:var(--paper);
-    border:3px solid rgba(22,21,15,.42);
-    border-radius:999px;
+    padding:0 4px;
+    margin-left:-4px;
+    color:var(--blue);
+    font-family:var(--script);
+    font-size:28px;
+    line-height:1;
     text-decoration:none;
-    box-shadow:0 2px 10px rgba(22,21,15,.12);
-    transition:background .18s ease,color .18s ease,border-color .18s ease;
+    transition:color .2s, box-shadow .2s;
   }
+  .back .arrow{font-family:var(--sans);font-size:.7em}
   .back:hover,
   .back:focus-visible{
-    background:var(--stamp);
-    border-color:var(--stamp);
-    color:var(--paper);
+    color:var(--green);
+    box-shadow:0 2px var(--green);
+    outline:none;
+  }
+  .logo{display:flex;align-items:center}
+  .logo img{
+    display:block;
+    height:calc(var(--bar-h) * .5);
+    width:auto;
+    mix-blend-mode:multiply;
   }
 
   /* ─────────── page ─────────── */
   main{
-    max-width:42rem;
+    max-width:calc(42rem + var(--pad) * 2);
     margin:0 auto;
-    padding:6rem 24px 96px;
+    padding:calc(var(--bar-h) + 6px + 44px) var(--pad) 96px;
   }
 
   h1{
-    font-family:var(--display);
+    font-family:var(--script);
     font-weight:400;
-    font-size:clamp(2rem,7vw,3rem);
+    font-size:clamp(34px, 7vw, 52px);
     line-height:1.05;
-    letter-spacing:-.015em;
+    color:var(--red);
     margin:0 0 28px;
   }
 
   main p,
   main li{
-    font-size:1.05rem;
-    line-height:1.55;
-    color:rgba(22,21,15,.86);
+    font-size:var(--t);
+    line-height:21px;
   }
-  main p{margin:0 0 16px}
-  main strong{font-weight:400;color:var(--ink);-webkit-text-stroke:.4px var(--ink)}
+  main p{margin:0 0 14px}
+  main strong{font-weight:600}
 
   h2{
-    font-family:var(--util);
-    font-weight:700;
-    font-size:.78rem;
-    letter-spacing:.24em;
-    text-transform:uppercase;
-    margin:40px 0 12px;
-    padding-top:22px;
-    border-top:1px solid var(--rule);
+    font-family:var(--script);
+    font-weight:400;
+    font-size:28px;
+    line-height:1.1;
+    color:var(--red);
+    margin:36px 0 12px;
+    padding-top:20px;
+    border-top:1.5px solid var(--rule);
   }
 
-  ul{margin:0 0 16px;padding-left:1.2em}
-  li{margin-bottom:8px}
-  li::marker{color:var(--stamp)}
+  ul{margin:0 0 14px;padding-left:1.2em}
+  li{margin-bottom:6px}
+  li::marker{color:var(--red)}
 
   .intro-end{
-    margin-top:40px;
-    padding-top:22px;
-    border-top:1px solid var(--rule);
+    margin-top:36px;
+    padding-top:20px;
+    border-top:1.5px solid var(--rule);
   }
 
   /* ─────────── form ─────────── */
-  .required-note{
-    font-family:var(--util);
-    font-size:.7rem;
-    letter-spacing:.06em;
-    color:var(--faded);
-    margin:0 0 28px;
-  }
+  .required-note{margin:0 0 26px}
 
-  .field{margin:0 0 30px}
+  .field{margin:0 0 26px}
 
   label,
   legend{
     display:block;
     padding:0;
-    font-family:var(--util);
-    font-weight:400;
-    font-size:.9rem;
-    line-height:1.4;
+    font-size:var(--t);
+    line-height:var(--tl);
     margin-bottom:8px;
   }
-  .req{color:var(--ink);font-weight:700}
+  .req{color:var(--red);font-weight:600}
 
   fieldset{
     border:0;
     padding:0;
-    margin:0 0 30px;
+    margin:0 0 26px;
     min-width:0;
   }
 
@@ -157,16 +192,15 @@
   textarea{
     display:block;
     width:100%;
-    font:inherit;
-    font-family:var(--body);
-    font-weight:400;
-    font-size:1rem;          /* 16px+ stops iOS zooming on focus */
+    font-family:var(--sans);
+    font-variation-settings:"wdth" 92;
+    font-size:16px;
     line-height:1.4;
     color:var(--ink);
-    background:var(--paper);
-    border:2px solid rgba(22,21,15,.42);
+    background:transparent;
+    border:1.5px solid var(--rule);
     border-radius:0;
-    padding:11px 12px;
+    padding:10px 12px;
     min-height:44px;
     appearance:none;
     -webkit-appearance:none;
@@ -174,12 +208,12 @@
   textarea{min-height:7.5rem;resize:vertical}
   input:focus,
   textarea:focus{
-    border-color:var(--ink);
-    outline:2px solid var(--stamp);
-    outline-offset:2px;
+    border-color:var(--blue);
+    outline:2px solid var(--blue);
+    outline-offset:1px;
   }
 
-  .radios{display:flex;flex-wrap:wrap;gap:10px 28px}
+  .radios{display:flex;flex-wrap:wrap;gap:6px 28px}
   .radios label{
     display:inline-flex;
     align-items:center;
@@ -192,64 +226,71 @@
     width:1.2rem;
     height:1.2rem;
     margin:0;
-    accent-color:var(--ink);
+    accent-color:var(--blue);
   }
 
   .times{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .times label{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faded)}
 
-  .h-captcha{margin:0 0 30px;min-height:78px}
+  .h-captcha{margin:0 0 26px;min-height:78px}
 
   .submit{
-    font-family:var(--util);
-    font-weight:400;
-    font-size:.78rem;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    color:var(--paper);
-    background:var(--ink);
-    border:3px solid var(--ink);
-    border-radius:999px;
+    font-family:var(--script);
+    font-size:28px;
+    line-height:1;
+    color:var(--blue);
+    background:transparent;
+    border:1.5px solid var(--blue);
+    border-radius:0;
     min-height:48px;
-    padding:0 34px;
+    padding:6px 30px 8px;
     cursor:pointer;
-    transition:background .18s ease,border-color .18s ease;
+    transition:background .2s, color .2s, border-color .2s;
   }
   .submit:hover,
-  .submit:focus-visible{background:var(--stamp);border-color:var(--stamp)}
+  .submit:focus-visible{background:var(--blue);color:var(--paper)}
   .submit:disabled{opacity:.6;cursor:progress}
 
-  .status{margin:18px 0 0;font-family:var(--util);font-size:.9rem;line-height:1.5}
+  .status{margin:18px 0 0}
   .status.error{
     padding:12px 14px;
-    border:2px solid var(--ink);
+    border:1.5px solid var(--red);
+    color:var(--red);
   }
   .status:empty{display:none}
-  .status a{color:var(--ink);text-decoration-color:var(--stamp);text-decoration-thickness:2px;text-underline-offset:2px}
+  .status a{color:inherit}
 
   .thanks{
-    border-top:1px solid var(--rule);
-    padding-top:22px;
+    border-top:1.5px solid var(--rule);
+    padding-top:20px;
   }
   .thanks h2{margin-top:0;padding-top:0;border-top:0}
   .thanks:focus{outline:none}
 
-  :focus-visible{outline:2px solid var(--stamp);outline-offset:3px}
+  :focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 
+  @media (max-width:991px){
+    :root{--pad:16px}
+  }
   @media (max-width:560px){
-    main{padding-top:5.5rem}
+    :root{--bar-h:72px}
+    .back{font-size:24px}
     .times{grid-template-columns:1fr}
   }
 </style>
 </head>
 <body>
 
-<div class="grain" aria-hidden="true"></div>
+<div class="texture" aria-hidden="true"></div>
 
-<a class="back" href="/"><span aria-hidden="true">←</span> Back</a>
+<header class="bar">
+  <a class="back" href="/"><span class="arrow" aria-hidden="true">←</span> Back</a>
+  <a class="logo" href="/" aria-label="Endless Library, home">
+    <img src="/assets/logo.png" width="500" height="125" alt="Endless Library">
+  </a>
+</header>
 
 <main>
-  <h1>Event Proposals @ Endless Library</h1>
+  <h1>Event Proposals <span class="sans">@</span> Endless Library</h1>
 
   <p>Endless Library is open to proposals for <strong>free</strong> or <strong>ticketed</strong> events/reading groups/workshops/hobby clubs/anything else you can think of. We are particularly interested in proposals that respond to the space as a library. The possibilities are endless...</p>
 
@@ -265,7 +306,7 @@
     <li>Small-scale (~8pp) events that occur during Library opening hours (Saturday &amp; Sunday 9am-6pm) incur no hire fee</li>
   </ul>
 
-  <h2>The Library &amp; facilities</h2>
+  <h2>The Library <span class="sans">&amp;</span> facilities</h2>
   <ul>
     <li>1/292 Marrickville Road, accessed via Marrickville Lane</li>
     <li>Is not wheelchair accessible; 2 flights of stairs to access the space</li>

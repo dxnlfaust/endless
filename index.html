@@ -3,504 +3,662 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>endless library</title>
-<meta name="description" content="2222 endless 2222">
+<title>Endless Library</title>
+<meta name="description" content="Endless Library is an independent library and community activity space in Marrickville, Sydney.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..600&display=swap" rel="stylesheet">
+<link rel="preload" href="assets/Belledejour.ttf" as="font" type="font/ttf" crossorigin>
 <style>
+  /* ─────────── fonts ───────────
+     Belledejour: nav, poem, intro text, headings, acknowledgement.
+     It has letters and quotes only (no digits or most punctuation), so
+     anything with numbers — hours, dates, times — is set in the sans.
+     Archivo stands in for the design's Acumin Variable Concept.        */
+  @font-face{
+    font-family:"Belledejour";
+    src:url("assets/Belledejour.ttf") format("truetype");
+    font-weight:400;
+    font-style:normal;
+    font-display:swap;
+  }
+
   :root{
+    --blue:#1a63ff;
+    --green:#1a7935;
+    --red:#ff3b3b;
+    --rule:#ff1f1f;
+    --ink:#111;
     --paper:#fff;
-    --ink:#16150f;
-    --stamp:#9B9B98;
-    --faded:#7e7e73;
-    --rule:rgba(22,21,15,.16);
-    --display:"Gloock",Georgia,serif;
-    --body:serif;
-    --util:sans-serif;
+    --tone:#f2f1ee;                 /* the paper colour the texture layer multiplies in */
+    --script:"Belledejour", Georgia, serif;
+    --sans:"Archivo", "Helvetica Neue", Arial, sans-serif;
+    --t:14px;                       /* the one size every sans text uses */
+    --tl:17px;                      /* ...and its line height */
+    --ack-h:44px;
+    --nav-h:clamp(92px, 13svh, 132px);
+    --pad:20px;                     /* shared left/right gutter: logo, sidebar, nav, poem */
   }
 
   *{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
-
   body{
     margin:0;
     background:var(--paper);
     color:var(--ink);
-    font-family:var(--body);
-    font-weight:300;
+    font-family:var(--sans);
+    font-size:var(--t);
+    line-height:var(--tl);
+    font-variation-settings:"wdth" 92;
     -webkit-font-smoothing:antialiased;
   }
+  a{color:inherit}
 
-  /* paper grain — the material, not decoration */
-  .grain{
+  /* ─────────── texture ───────────
+     Stands in for the Webflow noise + paper-scan layers: one fixed sheet,
+     multiplied over everything, tinting white to paper and adding grain. */
+  .texture{
     position:fixed;
     inset:0;
+    z-index:1000;
     pointer-events:none;
-    z-index:50;
-    opacity:.4;
     mix-blend-mode:multiply;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='.22'/></svg>");
+    background-color:var(--tone);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -1.1 1.05'/></filter><rect width='220' height='220' filter='url(%23n)'/></svg>");
+    opacity:.95;
   }
 
-  /* ─────────── about easter egg ─────────── */
-  .pac-line{
+  /* ─────────── nav ─────────── */
+  /* The header is built on the page's own columns: the logo sits over the
+     sidebar and the four links sit over the four poem columns, so every
+     left edge lines up with the text below it. Logo height is a fixed
+     share of the bar, so top and bottom space stay equal at any size.   */
+  .nav-bar{
     position:fixed;
+    top:0;
     left:0;
+    z-index:10;
     width:100%;
-    overflow:hidden;
-    z-index:60;
+    height:var(--nav-h);
+    display:flex;
+    align-items:center;
+  }
+  .logo{
+    flex:none;
+    width:30vw;
+    padding:0 var(--pad);
+    display:flex;
+    align-items:center;
+  }
+  .logo img{
+    display:block;
+    height:calc(var(--nav-h) * .56);
+    width:auto;
+    max-width:100%;
+    object-fit:contain;
+    object-position:left center;
+    mix-blend-mode:multiply;
+  }
+  .nav-links{
+    flex:1;
+    min-width:0;
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:16px;
+    padding:0 var(--pad);
+  }
+  .nav-link{
+    justify-self:start;
+    color:var(--blue);
+    font-family:var(--script);
+    font-size:clamp(21px, 2.1vw, 30px);
+    line-height:1.1;
+    text-decoration:none;
+    margin:0 0 0 10px;
+    background:none;
+    border:0;
+    padding:0;
+    cursor:pointer;
+    transition:color .2s, box-shadow .2s;
+  }
+  .nav-link:hover,
+  .nav-link:focus-visible{
+    color:var(--green);
+    box-shadow:0 2px var(--green);
+    outline:none;
+  }
+  .menu-toggle{display:none}
+
+  /* mobile menu: blue panel that slides in from the right */
+  .mobile-menu{
+    position:fixed;
+    inset:0;
+    z-index:150;
+    display:flex;
+    justify-content:flex-end;
     pointer-events:none;
-    opacity:0;
-    transition:opacity 2s ease-in-out;
+    visibility:hidden;
+    transition:visibility 0s .55s;
   }
-  .pac-line.pac-top{top:16.6667%;transform:translateY(-50%)}
-  .pac-line.pac-bottom{top:83.3333%;transform:translateY(-50%)}
-
-  .pac-track{
-    display:inline-block;
-    white-space:nowrap;
-    will-change:transform;
-    animation:pacScroll 7s linear infinite;
-  }
-  .pac-track span{
-    display:inline-block;
-    padding-right:6vw;
-    font-family:var(--display);
-    font-size:15vh;
-    line-height:1;
-    color:#FFDCF2;
-  }
-  @keyframes pacScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-
-  /* ─────────── hero ─────────── */
-  .hero{
-    min-height:100svh;
+  .mobile-menu .scrim{flex:1}
+  .mobile-menu .panel{
+    width:70vw;
+    height:100%;
+    background:var(--blue);
     display:flex;
     flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:56px 24px 40px;
-    position:relative;
-    text-align:center;
+    padding:146px 39px 39px;
+    transform:translateX(100%);
+    transition:transform .55s cubic-bezier(.65,0,.35,1);
   }
-
-  .mark{
-    width:min(380px,72vw);
-    aspect-ratio:1076/727;
-    margin-bottom:6px;
+  .mobile-menu.open{
+    pointer-events:auto;
+    visibility:visible;
+    transition:visibility 0s 0s;
   }
-  .mark img{
-    display:block;
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    mix-blend-mode:multiply;
+  .mobile-menu.open .panel{transform:none}
+  .mobile-menu .nav-link{
+    color:#fff;
+    font-size:38px;
+    margin:0 0 3vh;
+    align-self:flex-start;
+    text-align:left;
   }
-
-  .wordmark{
-    font-family:var(--display);
-    font-weight:400;
-    font-size:clamp(2.6rem,9.2vw,5.4rem);
-    line-height:.92;
-    letter-spacing:-.028em;
-    margin:0;
-    text-transform:lowercase;
-  }
-
-  .tagline{
-    font-family:var(--util);
-    font-size:.68rem;
-    letter-spacing:.3em;
-    text-transform:uppercase;
-    color:var(--faded);
-    margin:18px 0 0;
-  }
-
-  .links{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:10px;
-    margin-top:34px;
-  }
-  .links a{
-    font-family:var(--util);
-    font-weight:400;
-    font-size:.72rem;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    color:var(--ink);
-    border:3px solid transparent;
-    border-radius:999px;
-    padding:10px 20px 9px;
-    text-decoration-line:underline;
-    text-decoration-color:transparent;
-    text-decoration-thickness:3px;
-    text-underline-offset:4px;
-    transition:background .18s ease,color .18s ease,border-color .18s ease,text-decoration-color .18s ease;
-  }
-  .links a#link-forum{
-    border-color:rgba(22,21,15,.42);
-  }
-  .links a:hover,
-  .links a:focus-visible{
-    text-decoration-color:var(--stamp);
-  }
-  .links a#link-forum:hover,
-  .links a#link-forum:focus-visible{
-    background:var(--stamp);
-    border-color:var(--stamp);
-    color:var(--paper);
-    text-decoration-color:transparent;
-  }
-
-  .cue{
+  .mobile-menu .nav-link:hover,
+  .mobile-menu .nav-link:focus-visible{color:#fff;box-shadow:0 2px #fff}
+  .menu-close{
     position:absolute;
-    left:0;
-    right:0;
-    bottom:26px;
-    width:max-content;
-    margin:0 auto;
-    font-family:var(--util);
-    font-size:.62rem;
-    letter-spacing:.28em;
-    text-transform:uppercase;
-    color:var(--faded);
-    text-decoration:none;
+    top:30px;
+    right:28px;
+    width:44px;
+    height:44px;
+    background:none;
+    border:0;
+    cursor:pointer;
+    padding:0;
+  }
+  .menu-close::before,
+  .menu-close::after{
+    content:"";
+    position:absolute;
+    top:50%;
+    left:6px;
+    right:6px;
+    height:3px;
+    background:#fff;
+  }
+  .menu-close::before{transform:rotate(45deg)}
+  .menu-close::after{transform:rotate(-45deg)}
+
+  /* ─────────── the page that the footer scrolls up over ─────────── */
+  .page{
+    position:sticky;
+    top:0;
+    z-index:0;
+    height:100vh;
+    height:100svh;
+    padding-bottom:var(--ack-h);
     display:flex;
-    align-items:center;
-    gap:.7em;
+    flex-direction:column;
+    justify-content:flex-end;
+  }
+  .line-panel{
+    position:relative;
+    height:6px;
+    border-top:1.5px solid var(--rule);
+    border-bottom:1.5px solid var(--rule);
+  }
+  .body-panel{
+    display:flex;
+    height:calc(100svh - var(--ack-h) - var(--nav-h) - 6px);
+  }
+  .sidebar{
+    width:30vw;
+    flex:none;
+    height:100%;
+    border-right:2px solid var(--rule);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:var(--pad);
+  }
+  .intro-text{
+    font-family:var(--sans);
     font-weight:400;
+    font-size:var(--t);
+    line-height:var(--tl);
+    margin:0;
+    max-width:15em;
   }
-  .cue span{color:var(--stamp);animation:bob 2.6s ease-in-out infinite}
-  @keyframes bob{0%,100%{transform:translateY(-2px)}50%{transform:translateY(2px)}}
+  .sidebar-art{
+    flex:1 1 0;
+    min-height:0;
+    width:100%;
+    margin:12px 0;
+    object-fit:contain;
+    object-position:center;
+    mix-blend-mode:multiply;
+    pointer-events:none;
+    user-select:none;
+  }
+  .details{
+    font-size:var(--t);
+    line-height:var(--tl);
+    margin:0;
+  }
+  .details a{color:var(--ink)}
+  .text-link{
+    text-decoration:underline;
+    text-underline-offset:2px;
+    background:none;
+    border:0;
+    padding:0;
+    font:inherit;
+    color:inherit;
+    text-align:left;
+    cursor:pointer;
+  }
+  .text-link:hover{color:var(--green)}
 
-  /* ─────────── events ─────────── */
-  .card{
-    max-width:720px;
-    margin:0 auto;
-    padding:0 24px 96px;
+  .page-content{
+    position:relative;
+    flex:1;
+    min-width:0;
+    overflow:hidden;
   }
 
-  .card-head{
+  /* ─────────── poem ───────────
+     A grid of dots. Hover a dot and its word fades in beside it; hover
+     the little glyph in the corner and the whole poem appears at once. */
+  .page-content{container-type:inline-size}
+  .poem{
+    /* Each word's size is worked out from its column width (container query
+       units), so the longest word always fits whatever the screen.
+       --r is the widest word ("libraries") in em, measured in Belledejour. */
+    --cols:4;
+    --gap:16px;
+    --padl:var(--pad);
+    --padr:var(--pad);
+    --wpad:10px;
+    --dotw:20px;
+    --r:3.1;
+    --fs-max:30px;
+    display:grid;
+    grid-template-columns:repeat(var(--cols), minmax(0, 1fr));
+    grid-template-rows:repeat(4, 1fr);
+    gap:var(--gap);
+    height:100%;
+    padding:var(--pad) var(--padr) var(--pad) var(--padl);
+    margin:0;
+    list-style:none;
+  }
+  .word{
     display:flex;
     align-items:baseline;
-    gap:16px;
-    padding-bottom:14px;
-  }
-  .card-head h2{
-    font-family:var(--util);
-    font-weight:700;
-    font-size:.72rem;
-    letter-spacing:.28em;
-    text-transform:uppercase;
-    margin:0;
+    padding:0 var(--wpad);
+    color:var(--red);
     white-space:nowrap;
+    font-size:22px;
+    font-size:min(var(--fs-max), calc(((100cqi - var(--padl) - var(--padr) - (var(--cols) - 1) * var(--gap)) / var(--cols) - 2 * var(--wpad) - var(--dotw)) / var(--r)));
   }
-  .card-head .fill{flex:1;height:1px;background:var(--rule)}
-  .card-head .count{
-    font-family:var(--util);
-    font-size:.68rem;
-    color:var(--faded);
-    white-space:nowrap;
+  .dot{
+    font-family:var(--sans);
+    font-size:var(--t);
+    width:var(--dotw);
+    flex:none;
+    cursor:default;
+    transition:opacity .5s ease;
+  }
+  .dot::before{content:"\2022"}
+  .w{
+    font-family:var(--script);
+    opacity:0;
+    transition:opacity .6s cubic-bezier(.33,1,.68,1);
+    transition-delay:0s;
+  }
+  .word.on .w{opacity:1}
+  @media (hover:hover){ .word:hover .w{opacity:1} }
+  .poem.reveal .w{opacity:1;transition-delay:calc(var(--i) * 35ms)}
+  .poem.reveal .dot{opacity:0}
+
+  .poem-reveal{
+    position:absolute;
+    right: 7px;
+    bottom: 59px;
+    width:30px;
+    height:32px;
+    padding:0;
+    border:0;
+    background:url("assets/poem-reveal.png") center/contain no-repeat;
+    mix-blend-mode:multiply;
+    cursor:pointer;
   }
 
+  /* ─────────── acknowledgement bar (fixed while the page is in view) ─────────── */
+  .ack{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:100;
+    height:var(--ack-h);
+    display:flex;
+    align-items:center;
+    padding:5px var(--pad);
+    background:var(--paper);
+    border-top:1.5px solid var(--rule);
+    color:var(--red);
+    font-family:var(--sans);
+    font-size:var(--t);
+    line-height:var(--tl);
+    margin:0;
+  }
+
+  /* ─────────── footer: scrolls up over the page ─────────── */
+  .footer{
+    position:relative;
+    z-index:2;
+    display:flex;
+    min-height:330px;
+    padding-bottom:var(--ack-h);
+    background:var(--paper);
+    border-top:1.5px solid var(--rule);
+  }
+  .footer .ack{position:absolute}
+  .footer-info{
+    display:none;                   /* desktop/tablet: the sidebar carries this info */
+    width:30vw;
+    flex:none;
+    padding:var(--pad);
+    flex-direction:column;
+    justify-content:space-between;
+  }
+  .footer-title{
+    font-family:var(--script);
+    font-weight:400;
+    font-size:25px;
+    line-height:1.1;
+    margin:0;
+  }
+  .events-wrap{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    padding:20px 0 0;
+  }
+  .events-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:16px;
+    padding:0 var(--pad) 14px;
+  }
+  .events-head h2{
+    font-family:var(--script);
+    font-weight:400;
+    font-size:32px;
+    line-height:1.1;
+    color:var(--red);
+    margin:0;
+  }
+  .events-head a{
+    font-size:var(--t);
+    line-height:var(--tl);
+    color:var(--ink);
+    text-underline-offset:2px;
+    white-space:nowrap;
+  }
+  .events-head a:hover{color:var(--green)}
+
+  /* the horizontal row */
+  .events{
+    flex:1;
+    display:flex;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    scrollbar-width:thin;
+    scrollbar-color:var(--rule) transparent;
+    padding:0 0 18px;
+    margin:0;
+    list-style:none;
+  }
   .event{
-    display:grid;
-    grid-template-columns:104px 1fr;
-    gap:26px;
-    padding:30px 0;
-    border-top:1px solid var(--rule);
+    flex:0 0 clamp(220px, 17.5vw, 320px);
+    scroll-snap-align:start;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    padding:2px var(--pad) 4px;
+    border-left:1.5px solid var(--rule);
     opacity:0;
     transform:translateY(14px);
-    transition:opacity .7s ease,transform .7s ease;
+    transition:opacity .6s ease, transform .6s cubic-bezier(.33,1,.68,1);
+    transition-delay:calc(var(--i, 0) * 80ms);
   }
-  .event.seen{opacity:1;transform:none}
-
-  .stamp{
-    font-family:var(--util);
-    font-weight:700;
-    color:var(--stamp);
-    border:3px solid var(--stamp);
-    padding:8px 4px 7px;
-    text-align:center;
-    line-height:1.1;
-    mix-blend-mode:multiply;
-    justify-self:start;
-    width:100%;
-  }
-  .stamp .m{display:block;font-size:.64rem;letter-spacing:.24em;text-transform:uppercase}
-  .stamp .d{display:block;font-size:1.34rem;letter-spacing:.04em;margin-top:2px}
-
-  .stamp.stamp-image{
-    border:none;
-    padding:0;
-    mix-blend-mode:normal;
-    overflow:hidden;
-    aspect-ratio:4/5;
-    background-size:cover;
-    background-position:center;
-  }
-  .stamp.stamp-image img{
-    display:block;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-  }
-
-  .event h3{
-    font-family:var(--body);
-    font-weight:400;
-    font-size:1.34rem;
-    line-height:1.24;
-    letter-spacing:-.01em;
-    margin:0 0 7px;
-  }
-  .event h3 a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
-  .event h3 a:hover,
-  .event h3 a:focus-visible{border-bottom-color:var(--stamp)}
-
-  .meta{
-    font-family:var(--util);
-    font-size:.68rem;
-    letter-spacing:.06em;
-    color:var(--faded);
-    margin:0 0 10px;
-  }
-  .meta a{
-    color:var(--ink);
-    text-decoration-line:underline;
-    text-decoration-color:var(--stamp);
-    text-decoration-thickness:2px;
-    text-underline-offset:2px;
-  }
-  .meta a:hover,
-  .meta a:focus-visible{color:var(--stamp)}
-
-  .note{
-    font-size:1rem;
-    line-height:1.5;
+  .event:first-child{border-left:0}
+  .footer.seen .event{opacity:1;transform:none}
+  .event .when{
+    font-size:var(--t);
+    line-height:var(--tl);
+    letter-spacing:.02em;
+    color:var(--blue);
     margin:0;
-    max-width:44ch;
-    color:rgba(22,21,15,.82);
   }
-
-  .empty{
-    border-top:1px solid var(--rule);
-    padding:40px 0 8px;
-    max-width:44ch;
+  .event h3{
+    font-family:var(--sans);
+    font-weight:500;
+    font-size:var(--t);
+    line-height:var(--tl);
+    margin:0;
   }
-  .empty p{font-size:1rem;line-height:1.5;margin:0 0 14px}
-  .empty a{
-    font-family:var(--util);
-    font-size:.7rem;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    color:var(--ink);
+  .event h3 a{
     text-decoration:none;
-    border-bottom:1px solid var(--stamp);
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:3;
+    overflow:hidden;
   }
-
-  .all{
-    border-top:1px solid var(--rule);
-    padding-top:22px;
+  .event h3 a:hover{color:var(--green);text-decoration:underline;text-underline-offset:2px}
+  .event .meta,
+  .event .note{
+    font-size:var(--t);
+    line-height:var(--tl);
+    margin:0;
   }
-  .all a{
-    font-family:var(--util);
-    font-size:.7rem;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    color:var(--faded);
-    text-decoration:none;
+  .event .note{
+    color:#555;
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:3;
+    overflow:hidden;
   }
-  .all a:hover,.all a:focus-visible{color:var(--ink)}
-
-  /* page-load sequence */
-  .rise{opacity:0;transform:translateY(14px);animation:rise .9s cubic-bezier(.2,.7,.3,1) forwards}
-  .mark.rise{animation-delay:.05s}
-  .wordmark.rise{animation-delay:.32s}
-  .tagline.rise{animation-delay:.46s}
-  .links.rise{animation-delay:.58s}
-  .cue.rise{animation-delay:.9s}
-  @keyframes rise{to{opacity:1;transform:none}}
-
-  :focus-visible{outline:2px solid var(--stamp);outline-offset:3px}
-
-  @media (max-width:560px){
-    .event{grid-template-columns:1fr;gap:14px}
-    .stamp{width:88px}
-    .card-head .count{display:none}
-  }
-
-  @media (prefers-reduced-motion:reduce){
-    .rise,.event{animation:none!important;opacity:1!important;transform:none!important;transition:none}
-    .cue span{animation:none}
-    .pac-track{animation:none!important}
+  .event .meta a{text-underline-offset:2px}
+  .event .meta a:hover{color:var(--green)}
+  .events-empty{
+    padding:0 var(--pad);
+    font-size:var(--t);
+    line-height:var(--tl);
+    max-width:36em;
   }
 
   /* ─────────── gallery popup ─────────── */
   .gallery-panel{
-    width:min(520px,calc(100vw - 32px));
+    width:min(520px, calc(100vw - 32px));
     max-height:calc(100svh - 48px);
     overflow:auto;
     margin:auto;
-    padding:44px 36px 36px;
-    border:3px solid var(--ink);
+    padding:44px 32px 32px;
+    border:1.5px solid var(--rule);
     background:var(--paper);
     color:var(--ink);
-    text-align:left;
   }
-  .gallery-panel::backdrop{background:rgba(22,21,15,.45)}
+  .gallery-panel::backdrop{background:rgba(17,17,17,.35)}
   .gallery-panel h2{
-    font-family:var(--display);
-    font-weight:400;
-    font-size:clamp(1.5rem,5vw,1.9rem);
-    line-height:1.12;
-    letter-spacing:-.015em;
-    margin:0 0 20px;
+    font-family:var(--sans);
+    font-weight:500;
+    font-size:var(--t);
+    line-height:var(--tl);
+    margin:0 0 18px;
+    color:var(--red);
   }
-  .gallery-panel p{
-    font-size:1.08rem;
-    line-height:1.5;
-    margin:0 0 14px;
-  }
-  .gallery-panel a{
-    color:var(--ink);
-    text-decoration-line:underline;
-    text-decoration-color:var(--stamp);
-    text-decoration-thickness:2px;
-    text-underline-offset:3px;
-  }
-  .gallery-panel a:hover,
-  .gallery-panel a:focus-visible{color:var(--stamp)}
+  .gallery-panel p{font-size:var(--t);line-height:var(--tl);margin:0 0 12px}
+  .gallery-panel a:hover{color:var(--green)}
   .gallery-panel .deadline{
-    font-family:var(--util);
-    font-weight:700;
-    font-size:.72rem;
-    letter-spacing:.22em;
+    font-size:var(--t);
+    font-weight:600;
+    letter-spacing:.12em;
     text-transform:uppercase;
-    margin:24px 0 0;
+    color:var(--blue);
+    margin:22px 0 0;
   }
   .gallery-close{
     position:absolute;
     top:10px;
     right:12px;
-    font-family:var(--util);
-    font-size:1.5rem;
-    line-height:1;
-    color:var(--ink);
+    font:400 28px/1 var(--sans);
+    color:var(--red);
     background:none;
     border:0;
-    padding:6px 10px;
+    padding:4px 10px;
     cursor:pointer;
   }
-  .gallery-close:hover{color:var(--stamp)}
 
-  .ml-nbx .z-10 {
-    display: none !important; /* hide the MailerLite badge */
+  .sr-only{
+    position:absolute;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+    clip:rect(0 0 0 0);
+    white-space:nowrap;
+  }
+
+  .ml-nbx .z-10{display:none !important}   /* hide the MailerLite badge */
+
+  /* ─────────── tablet ─────────── */
+  @media (max-width:991px){
+    :root{--ack-h:52px;--nav-h:84px}
+    .nav-links{display:none}
+    .menu-toggle{display:block;margin:0 var(--pad) 0 auto;font-size:34px}
+    .logo{width:auto}
+    .sidebar{width:38vw}
+    .poem{--gap:8px;--wpad:6px;--padl:12px;--padr:12px;--fs-max:26px}
+  }
+
+  /* ─────────── phone ───────────
+     The poem becomes a single column of 16 lines, so each word has the
+     full column to itself instead of a sliver. Size also respects the
+     screen height so all 16 lines fit without scrolling.               */
+  @media (max-width:767px){
+    :root{--ack-h:66px;--pad:16px}
+    .sidebar{display:none}
+    .poem{
+      --cols:2;
+      --gap:12px;
+      --wpad:4px;
+      --dotw:16px;
+      --padl:var(--pad);
+      --padr:var(--pad);
+      --fs-max:26px;
+      grid-template-rows:repeat(8, 1fr);
+      row-gap:0;
+      padding-top:16px;
+      padding-bottom:16px;
+    }
+    .word{align-items:center}
+    .footer{flex-direction:column-reverse;min-height:0}
+    .footer-info{display:flex;width:auto;border-right:0;border-top:1.5px solid var(--rule);gap:24px}
+    .events-head{padding:0 var(--pad) 12px}
+    .event{flex-basis:78vw;padding:2px var(--pad) 4px}
+  }
+  @media (max-width:479px){
+    :root{--nav-h:72px}
+  }
+  @media (max-width:359px){
+    :root{--ack-h:86px}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition-duration:0s !important;transition-delay:0s !important}
+    .event{opacity:1;transform:none}
   }
 </style>
 </head>
 <body>
 
-<div class="grain" aria-hidden="true"></div>
+<div class="texture" aria-hidden="true"></div>
 
-<div class="pac-line pac-top" id="pac-top" aria-hidden="true">
-  <div class="pac-track">
-    <span>there are other libraries they have not told you about . . .</span><span>there are other libraries they have not told you about . . .</span>
-  </div>
-</div>
-<div class="pac-line pac-bottom" id="pac-bottom" aria-hidden="true">
-  <div class="pac-track">
-    <span>and they wish to speak with you</span><span>and they wish to speak with you</span>
-  </div>
-</div>
-
-<header class="hero">
-  <div class="mark rise">
-    <img src="mark.gif" alt="A heart drawn above an open book">
-  </div>
-
-  <h1 class="wordmark rise">endless library</h1>
-  <nav class="links rise" aria-label="Sections">
-    <a id="link-about" href="#">About</a>
-    <a id="list-link" class="ml-onclick-form" href="javascript:void(0)" onclick="ml('show', 'mC9fkp', true)">Subscribe</a>
-    <a id="link-gallery" href="#gallery">Gallery</a>
-    <a id="link-events-eoi" href="/event-submissions">Events EOI</a>
-    <a id="link-forum" href="https://shush.endlesslibrary.com.au">Shush</a>
+<header class="nav-bar">
+  <a class="logo" href="/" aria-label="Endless Library, home">
+    <img src="assets/logo.png" width="500" height="125" alt="Endless Library">
+  </a>
+  <nav class="nav-links" aria-label="Sections">
+    <a class="nav-link js-calendar" href="#footer">Calendar</a>
+    <a class="nav-link js-gallery" href="#gallery">Gallery</a>
+    <a class="nav-link" href="/event-submissions">Events EOI</a>
+    <a class="nav-link js-forum" href="https://shush.endlesslibrary.com.au">log in to Shush</a>
   </nav>
-
-  <a class="cue rise" href="#whats-on">upcoming events <span aria-hidden="true">↓</span></a>
+  <button class="nav-link menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
 </header>
 
-<main class="card" id="whats-on">
-  <div class="card-head">
-    <h2>upcoming events</h2>
-    <div class="fill" aria-hidden="true"></div>
-    <span class="count" id="count"></span>
+<div class="mobile-menu" id="mobile-menu">
+  <div class="scrim"></div>
+  <nav class="panel" aria-label="Sections">
+    <button class="menu-close" type="button"><span class="sr-only">Close menu</span></button>
+    <a class="nav-link js-calendar" href="#footer">Calendar</a>
+    <a class="nav-link js-gallery" href="#gallery">Gallery</a>
+    <a class="nav-link" href="/event-submissions">Events EOI</a>
+    <a class="nav-link js-subscribe" href="#subscribe">Subscribe</a>
+    <a class="nav-link js-forum" href="https://shush.endlesslibrary.com.au">Shush</a>
+  </nav>
+</div>
+
+<main class="page">
+  <div class="line-panel" aria-hidden="true"></div>
+  <div class="body-panel">
+    <aside class="sidebar">
+      <h1 class="intro-text">Endless Library is an independent library and community activity space.</h1>
+      <img class="sidebar-art" src="assets/sidebar.png" width="1024" height="1280" alt="" aria-hidden="true">
+      <p class="details">
+        Open Saturday and Sunday, 10am – 6pm<br>
+        1/292 Marrickville Road, Marrickville. Sydney<br><br>
+        <button class="text-link js-subscribe" type="button">Sign up to our newsletter</button><br>
+        <a href="mailto:contact@endlesslibrary.com.au">contact@endlesslibrary.com.au</a>
+      </p>
+    </aside>
+
+    <div class="page-content">
+      <p class="sr-only">There are other libraries they have not told you of; they wish to speak to you.</p>
+      <ul class="poem" id="poem" aria-hidden="true"></ul>
+      <button class="poem-reveal" type="button" id="poem-reveal" aria-label="Reveal the poem"></button>
+    </div>
   </div>
-
-  <!-- Placeholder events. Replaced by live Discourse events when the fetch
-       succeeds. Kept on failure only while CONFIG.demo is true. -->
-  <div class="events" id="events" data-placeholder="true">
-    <article class="event">
-      <div class="stamp" aria-hidden="true"><span class="m">Jul</span><span class="d">29</span></div>
-      <div>
-        <h3>Silent reading hour</h3>
-        <p class="meta">Reading room, upstairs · 6.30–8pm · free</p>
-        <p class="note">If you talk you die.</p>
-      </div>
-    </article>
-
-    <article class="event">
-      <div class="stamp" aria-hidden="true"><span class="m">Aug</span><span class="d">02</span></div>
-      <div>
-        <h3>Orgy porgy</h3>
-        <p class="meta">Reading room · 11am · members and anyone curious</p>
-        <p class="note">Bring your reading.</p>
-      </div>
-    </article>
-
-    <article class="event">
-      <div class="stamp" aria-hidden="true"><span class="m">Aug</span><span class="d">09</span></div>
-      <div>
-        <h3>Book and fluid swapping</h3>
-        <p class="meta">Back room · 2–4pm · bring a draft</p>
-        <p class="note">Books for books, fluids for fluids, or books for fluids.</p>
-      </div>
-    </article>
-
-    <article class="event">
-      <div class="stamp" aria-hidden="true"><span class="m">Aug</span><span class="d">15</span></div>
-      <div>
-        <h3>DMT psychic showdown</h3>
-        <p class="meta">Workbench · 6–9pm · $12 for materials</p>
-        <p class="note">Winner takes all non-lethal psychic battles</p>
-      </div>
-    </article>
-
-    <article class="event">
-      <div class="stamp" aria-hidden="true"><span class="m">Aug</span><span class="d">23</span></div>
-      <div>
-        <h3>Night shift: freak-off</h3>
-        <p class="meta">Whole building · 9pm–midnight · free</p>
-        <p class="note">Freak da books out.</p>
-      </div>
-    </article>
-
-    <article class="event">
-      <div class="stamp" aria-hidden="true"><span class="m">Sep</span><span class="d">06</span></div>
-      <div>
-        <h3>Overloards and indentured workers LARP day!</h3>
-        <p class="meta">Front desk · all day · no questions</p>
-        <p class="note">Library board is overlords, members are indentured workers! Wretched filth, scrub the floors and dust the dustjackets!</p>
-      </div>
-    </article>
-  </div>
-
-  <div class="all"><a id="link-all" href="https://shush.endlesslibrary.com.au/upcoming-events">All events on Shush →</a></div>
 </main>
+
+<p class="ack" aria-hidden="true">Endless Library Acknowledges the Wangal and Gadigal people of the Eora Nation as the traditional custodians of the Land on which we meet</p>
+
+<footer class="footer" id="footer">
+  <div class="footer-info">
+    <p class="details">
+      Open Saturday and Sunday, 10am – 6pm<br>
+      1/292 Marrickville Road, Marrickville. Sydney<br><br>
+      <button class="text-link js-subscribe" type="button">Sign up to our newsletter</button><br>
+      <a href="mailto:contact@endlesslibrary.com.au">contact@endlesslibrary.com.au</a>
+    </p>
+  </div>
+
+  <section class="events-wrap" aria-labelledby="events-title">
+    <div class="events-head">
+      <h2 id="events-title">Upcoming events</h2>
+      <a class="js-all-events" href="https://shush.endlesslibrary.com.au/upcoming-events">All events on Shush →</a>
+    </div>
+    <ul class="events" id="events">
+      <li class="events-empty">Loading events…</li>
+    </ul>
+  </section>
+
+  <p class="ack">Endless Library Acknowledges the Wangal and Gadigal people of the Eora Nation as the traditional custodians of the Land on which we meet</p>
+</footer>
 
 <dialog class="gallery-panel" id="gallery-panel" aria-labelledby="gallery-title">
   <button class="gallery-close" id="gallery-close" type="button" aria-label="Close">×</button>
@@ -514,283 +672,244 @@
 </dialog>
 
 <script>
-  /* ── Gallery popup ──────────────────────────────────────────────────── */
-  (() => {
-    const panel = document.getElementById('gallery-panel');
-    document.getElementById('link-gallery').addEventListener('click', (e) => {
-      e.preventDefault();
-      panel.showModal();
-    });
-    document.getElementById('gallery-close').addEventListener('click', () => panel.close());
-    // click on the backdrop (outside the panel's box) closes it
-    panel.addEventListener('click', (e) => {
-      const r = panel.getBoundingClientRect();
-      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) panel.close();
-    });
-  })();
-
   /* ── Config ─────────────────────────────────────────────────────────── */
   const CONFIG = {
     forum: 'https://shush.endlesslibrary.com.au',
-    limit: 6,          // events shown on the landing page
-    demo: true         // true: keep placeholder events if the fetch fails.
-                       // Set to false before going live so a broken fetch
-                       // shows the "check the forum" state instead of fiction.
+    limit: 10,                      // events shown in the footer row
+    timeZone: 'Australia/Sydney',   // show times as library time, wherever the visitor is
+    mailerliteForm: 'mC9fkp'
   };
 
-  /* ── Wire the links ─────────────────────────────────────────────────── */
-  document.getElementById('link-forum').href = CONFIG.forum;
-  document.getElementById('link-all').href = CONFIG.forum + '/upcoming-events';
+  const POEM = 'There are other libraries they have not told you of they wish to speak to you';
 
-  /* ── About easter egg ──────────────────────────────────────────────────
-     No About page yet — clicking flashes the tagline across the screen
-     instead. The .pac-track marquee scrolls constantly regardless; opacity
-     is driven directly (not via a keyframe animation) so a click mid fade
-     just redirects the existing transition back up to 1, rather than
-     snapping to 0 and restarting — clicking again "juices it back up". */
-  let pacOutTimer = null;
-  document.getElementById('link-about').addEventListener('click', (e) => {
-    e.preventDefault();
-    const lines = [document.getElementById('pac-top'), document.getElementById('pac-bottom')];
-    clearTimeout(pacOutTimer);
-    lines.forEach(el => { el.style.opacity = '1'; });
-    pacOutTimer = setTimeout(() => {
-      lines.forEach(el => { el.style.opacity = '0'; });
-    }, 2000);
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+
+  $$('.js-forum').forEach(a => { a.href = CONFIG.forum; });
+  $$('.js-all-events').forEach(a => { a.href = CONFIG.forum + '/upcoming-events'; });
+
+  /* ── Poem grid ──────────────────────────────────────────────────────── */
+  const poem = $('#poem');
+  POEM.split(' ').forEach((word, i) => {
+    const li = document.createElement('li');
+    li.className = 'word';
+    li.style.setProperty('--i', i);
+    li.innerHTML = '<span class="dot"></span><span class="w"></span>';
+    li.querySelector('.w').textContent = word;
+    // touch screens have no hover: a tap toggles the word instead
+    li.addEventListener('click', () => li.classList.toggle('on'));
+    poem.appendChild(li);
   });
 
-  /* ── Helpers ────────────────────────────────────────────────────────── */
-  const MONTH = new Intl.DateTimeFormat('en-AU', { month: 'short' });
+  const revealBtn = $('#poem-reveal');
+  const showPoem = on => poem.classList.toggle('reveal', on);
+  revealBtn.addEventListener('mouseenter', () => showPoem(true));
+  revealBtn.addEventListener('mouseleave', () => showPoem(false));
+  revealBtn.addEventListener('focus', () => showPoem(true));
+  revealBtn.addEventListener('blur', () => showPoem(false));
+  revealBtn.addEventListener('click', () => {
+    if (matchMedia('(hover:none)').matches) showPoem(!poem.classList.contains('reveal'));
+  });
+
+  /* ── Calendar ───────────────────────────────────────────────────────────
+     Slides the footer up over the page so the events row is in view.     */
+  $$('.js-calendar').forEach(a => a.addEventListener('click', e => {
+    e.preventDefault();
+    closeMenu();
+    $('#footer').scrollIntoView({
+      behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'auto' : 'smooth',
+      block: 'start'
+    });
+  }));
+
+  /* ── Gallery popup ──────────────────────────────────────────────────── */
+  const gallery = $('#gallery-panel');
+  $$('.js-gallery').forEach(a => a.addEventListener('click', e => {
+    e.preventDefault();
+    closeMenu();
+    gallery.showModal();
+  }));
+  $('#gallery-close').addEventListener('click', () => gallery.close());
+  gallery.addEventListener('click', e => {
+    const r = gallery.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) gallery.close();
+  });
+
+  /* ── Subscribe (MailerLite popup) ───────────────────────────────────── */
+  $$('.js-subscribe').forEach(el => el.addEventListener('click', e => {
+    e.preventDefault();
+    closeMenu();
+    if (typeof window.ml === 'function') window.ml('show', CONFIG.mailerliteForm, true);
+  }));
+
+  /* ── Mobile menu ────────────────────────────────────────────────────── */
+  const menu = $('#mobile-menu');
+  const toggle = $('.menu-toggle');
+  function openMenu() {
+    menu.classList.add('open');
+    toggle.setAttribute('aria-expanded', 'true');
+    setTimeout(() => $('.menu-close').focus(), 50);
+  }
+  function closeMenu() {
+    if (!menu.classList.contains('open')) return;
+    menu.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+  toggle.addEventListener('click', openMenu);
+  $('.menu-close').addEventListener('click', closeMenu);
+  $('.scrim').addEventListener('click', closeMenu);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
+  /* ── Events: formatting helpers ─────────────────────────────────────── */
+  const fmt = opts => new Intl.DateTimeFormat('en-AU', { timeZone: CONFIG.timeZone, ...opts });
+  const DAY = fmt({ weekday: 'short', day: 'numeric', month: 'long' });
+  const DATEKEY = fmt({ year: 'numeric', month: '2-digit', day: '2-digit' });
+  const CLOCK = fmt({ hour: 'numeric', minute: '2-digit', hour12: true });
 
   function clockTime(date) {
-    return date
-      .toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true })
-      .replace(':00', '')
-      .replace(/\s?(am|pm)/i, (m, p) => p.toLowerCase());
+    return CLOCK.format(date).replace(':00', '').replace(/\s?(am|pm)/i, (m, p) => p.toLowerCase());
   }
-
   function timeRange(start, end) {
     if (!end) return clockTime(start);
-    const sameDay = start.toDateString() === end.toDateString();
-    return sameDay ? clockTime(start) + '–' + clockTime(end) : clockTime(start);
+    return DATEKEY.format(start) === DATEKEY.format(end)
+      ? clockTime(start) + '–' + clockTime(end)
+      : clockTime(start) + ' until ' + DAY.format(end);
   }
-
-  function ordinal(n) {
-    const v = n % 100;
-    if (v >= 11 && v <= 13) return n + 'th';
-    switch (n % 10) {
-      case 1: return n + 'st';
-      case 2: return n + 'nd';
-      case 3: return n + 'rd';
-      default: return n + 'th';
-    }
-  }
-
-  function longDate(date) {
-    const month = date.toLocaleDateString('en-AU', { month: 'long' });
-    return month + ' ' + ordinal(date.getDate());
-  }
-
   function stripHtml(html) {
     if (!html) return '';
     const el = document.createElement('div');
     el.innerHTML = html;
     return (el.textContent || '').replace(/\s+/g, ' ').trim();
   }
-
   function truncate(text, max) {
     return text.length > max ? text.slice(0, max).replace(/\s\S*$/, '') + '…' : text;
   }
-
-  /* Pull the first URL out of a field (e.g. the event location) so it can be
-     rendered as a real link instead of visible plain text, and label it by
-     what kind of link it looks like. */
-  function extractLink(text) {
-    const match = text.match(/https?:\/\/\S+/i);
-    if (!match) return { text, link: null };
-
-    const url = match[0].replace(/[.,;:)\]]+$/, '');
-    const remaining = (text.slice(0, match.index) + text.slice(match.index + match[0].length))
-      .replace(/\s+/g, ' ')
-      .trim();
-    const lower = url.toLowerCase();
-    const label = lower.includes('rsvp') ? 'RSVP here'
-      : lower.includes('humanitix') ? 'Ticket link'
-      : 'Details';
-
-    return { text: remaining, link: { url, label } };
-  }
-
   function absolute(path) {
     if (!path) return CONFIG.forum + '/upcoming-events';
     try { return new URL(path, CONFIG.forum).href; } catch { return CONFIG.forum; }
   }
+  /* Pull the first URL out of the location so it renders as a link. */
+  function extractLink(text) {
+    const match = text.match(/https?:\/\/\S+/i);
+    if (!match) return { text, link: null };
+    const url = match[0].replace(/[.,;:)\]]+$/, '');
+    const rest = (text.slice(0, match.index) + text.slice(match.index + match[0].length)).replace(/\s+/g, ' ').trim();
+    const lower = url.toLowerCase();
+    const label = lower.includes('rsvp') ? 'RSVP here' : lower.includes('humanitix') ? 'Tickets' : 'Details';
+    return { text: rest, link: { url, label } };
+  }
 
-  /* ── Map one Discourse event object to what the page needs ──────────────
-     Field names come from the discourse-post-event serializer. Open
-     <forum>/discourse-post-event/events.json?include_details=true in a
-     browser once and adjust here if anything is named differently on your
-     version.                                                              */
+  /* ── Map one Discourse event to what the page needs ─────────────────────
+     Field names come from the discourse-post-event serializer
+     (<forum>/discourse-post-event/events.json?include_details=true).    */
   function normalise(raw) {
     const start = new Date(raw.starts_at);
     if (isNaN(start)) return null;
     const end = raw.ends_at ? new Date(raw.ends_at) : null;
     const topic = (raw.post && raw.post.topic) || {};
-    const upload = raw.image_upload || null;
-    const { text: locationText, link: locationLink } = extractLink(raw.location || '');
-
+    const loc = extractLink(raw.location || '');
+    // descriptions often carry the ticket / RSVP link; surface it, keep the words
+    const desc = extractLink(stripHtml(raw.description || ''));
+    const note = desc.text.replace(/https?:\/\/\S+/g, '').replace(/\s+/g, ' ').trim();
     return {
       start,
       end,
+      allDay: !!raw.all_day,
       title: raw.name || topic.title || 'Untitled event',
       url: absolute(raw.post && raw.post.url),
-      locationText,
-      locationLink,
-      note: truncate(stripHtml(raw.description || raw.raw_description || ''), 150),
-      image: upload ? {
-        url: absolute((upload.thumbnail && upload.thumbnail.url) || upload.url),
-        color: upload.dominant_color ? '#' + upload.dominant_color : null
-      } : null
+      locationText: loc.text,
+      locationLink: loc.link || desc.link,
+      note: truncate(note, 110)
     };
   }
 
   /* ── Render ─────────────────────────────────────────────────────────── */
+  const list = $('#events');
+
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
   function render(events) {
-    const list = document.getElementById('events');
-    list.removeAttribute('data-placeholder');
     list.textContent = '';
+    events.forEach((ev, i) => {
+      const li = el('li', 'event');
+      li.style.setProperty('--i', i);
 
-    events.forEach(ev => {
-      const article = document.createElement('article');
-      article.className = 'event';
+      li.appendChild(el('p', 'when', DAY.format(ev.start)));
 
-      const stamp = document.createElement('div');
-      stamp.className = 'stamp';
-      stamp.setAttribute('aria-hidden', 'true');
+      const h3 = el('h3');
+      const a = el('a', null, ev.title);
+      a.href = ev.url;
+      h3.appendChild(a);
+      li.appendChild(h3);
 
-      if (ev.image) {
-        stamp.classList.add('stamp-image');
-        if (ev.image.color) stamp.style.backgroundColor = ev.image.color;
-        const img = document.createElement('img');
-        img.src = ev.image.url;
-        img.alt = '';
-        img.loading = 'lazy';
-        stamp.appendChild(img);
-      } else {
-        stamp.innerHTML = '<span class="m"></span><span class="d"></span>';
-        stamp.querySelector('.m').textContent = MONTH.format(ev.start);
-        stamp.querySelector('.d').textContent = String(ev.start.getDate()).padStart(2, '0');
+      const meta = el('p', 'meta');
+      const parts = [ev.allDay ? 'All day' : timeRange(ev.start, ev.end)];
+      if (ev.locationText) parts.push(ev.locationText);
+      meta.textContent = parts.join(' · ');
+      if (ev.locationLink) {
+        meta.appendChild(document.createTextNode(' · '));
+        const l = el('a', null, ev.locationLink.label);
+        l.href = ev.locationLink.url;
+        l.target = '_blank';
+        l.rel = 'noopener';
+        meta.appendChild(l);
       }
+      li.appendChild(meta);
 
-      const body = document.createElement('div');
-
-      const h3 = document.createElement('h3');
-      const link = document.createElement('a');
-      link.href = ev.url;
-      link.textContent = ev.title;
-      h3.appendChild(link);
-
-      const meta = document.createElement('p');
-      meta.className = 'meta';
-      const metaParts = [];
-      if (ev.image) metaParts.push({ text: longDate(ev.start) });
-      if (ev.locationText) metaParts.push({ text: ev.locationText });
-      if (ev.locationLink) metaParts.push({ link: ev.locationLink });
-      metaParts.push({ text: timeRange(ev.start, ev.end) });
-
-      metaParts.forEach((part, i) => {
-        if (i > 0) meta.appendChild(document.createTextNode(' · '));
-        if (part.link) {
-          const a = document.createElement('a');
-          a.href = part.link.url;
-          a.target = '_blank';
-          a.rel = 'noopener';
-          a.textContent = part.link.label;
-          meta.appendChild(a);
-        } else {
-          meta.appendChild(document.createTextNode(part.text));
-        }
-      });
-
-      body.append(h3, meta);
-
-      if (ev.note) {
-        const note = document.createElement('p');
-        note.className = 'note';
-        note.textContent = ev.note;
-        body.appendChild(note);
-      }
-
-      article.append(stamp, body);
-      list.appendChild(article);
+      if (ev.note) li.appendChild(el('p', 'note', ev.note));
+      list.appendChild(li);
     });
-
-    document.getElementById('count').textContent =
-      events.length + (events.length === 1 ? ' event' : ' events');
-    reveal();
   }
 
-  function renderEmpty() {
-    const list = document.getElementById('events');
-    list.removeAttribute('data-placeholder');
-    list.innerHTML =
-      '<div class="empty"><p>Nothing on the calendar just now. New dates get posted to the forum first.</p>' +
-      '<a href="' + CONFIG.forum + '/upcoming-events">Check the forum calendar</a></div>';
-    document.getElementById('count').textContent = '';
+  function renderMessage(html) {
+    list.innerHTML = '<li class="events-empty">' + html + '</li>';
   }
 
-  /* ── Scroll reveal ──────────────────────────────────────────────────── */
-  function reveal() {
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach((entry, i) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => entry.target.classList.add('seen'), i * 90);
-          obs.unobserve(entry.target);
-        }
-      });
-    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.15 });
-
-    document.querySelectorAll('.event').forEach(el => obs.observe(el));
-  }
-
-  /* ── Load ───────────────────────────────────────────────────────────── */
-  async function load() {
-    const url = CONFIG.forum +
-      '/discourse-post-event/events.json?include_details=true&limit=50';
-
+  async function loadEvents() {
+    const url = CONFIG.forum + '/discourse-post-event/events.json?include_details=true&limit=50';
     try {
-      const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-
       const now = Date.now();
       const events = (data.events || [])
         .map(normalise)
         .filter(ev => ev && (ev.end || ev.start).getTime() >= now)
         .sort((a, b) => a.start - b.start)
         .slice(0, CONFIG.limit);
-
-      events.length ? render(events) : renderEmpty();
+      if (events.length) render(events);
+      else renderMessage('Nothing on the calendar just now. New dates go up on <a href="' + CONFIG.forum + '/upcoming-events">Shush</a> first.');
     } catch (err) {
       console.warn('[endless library] could not load events:', err.message);
-      if (CONFIG.demo) {
-        document.getElementById('count').textContent = 'placeholder';
-        reveal();
-      } else {
-        renderEmpty();
-      }
+      renderMessage('Events couldn’t load here. See what’s on at <a href="' + CONFIG.forum + '/upcoming-events">Shush</a>.');
     }
   }
 
-  load();
+  /* fade the event row in as the footer scrolls up into view */
+  const footer = $('#footer');
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries, obs) => {
+      if (entries.some(e => e.isIntersecting)) { footer.classList.add('seen'); obs.disconnect(); }
+    }, { threshold: 0.25 }).observe(footer);
+  } else {
+    footer.classList.add('seen');
+  }
+
+  loadEvents();
 </script>
+
 <!-- MailerLite Universal -->
 <script>
-    (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
-    .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
-    n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
-    (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
-    ml('account', '2535543');
+  (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
+  .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
+  n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
+  (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+  ml('account', '2535543');
 </script>
 <!-- End MailerLite Universal -->
 </body>

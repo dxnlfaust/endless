@@ -1,60 +1,56 @@
 # endlesslibrary.com.au
 
-Landing page for Endless Library. Static, no build step, no dependencies.
-The forum lives separately at <https://shush.endlesslibrary.com.au> (Discourse, on the VPS).
+Landing page for Endless Library, rebuilt from the designers' Webflow front page.
+Static, no build step, no Webflow scripts. The forum lives separately at
+<https://shush.endlesslibrary.com.au> (Discourse, on the VPS).
 
 ## Files
 
 | File | What it is |
 |---|---|
-| `index.html` | The whole page. Styles and script are inline. |
-| `mark.gif` | The drawn heart-and-book animation. 560px wide, 10fps, 2 colours. |
-| `404.html` | Styled 404 that also forwards old forum paths (`/t/…`, `/c/…`) to the subdomain. |
+| `index.html` | The home page. Styles and script are inline. |
+| `event-submissions/index.html` | Event proposal form at `/event-submissions` (Web3Forms + hCaptcha). |
+| `404.html` | Forwards old forum paths (`/t/…`, `/c/…`) to the subdomain; every other missing page redirects to a YouTube link. |
+| `assets/Belledejour.ttf` | Nav, poem, headings. |
+| `assets/logo.png` | The handwritten wordmark (from the Webflow project, 500px). |
+| `assets/sidebar.png` | Halftone artwork in the sidebar, between the intro text and the hours/address. |
+| `assets/poem-reveal.png` | The little glyph bottom-right of the poem; hover it to show the whole poem. |
+| `CNAME` | Custom domain. Don't delete it. |
 
-## Editing
+The sans is **Archivo** (Google Fonts), standing in for the design's Acumin.
+Belledejour has no digits and almost no punctuation, so anything with numbers
+(hours, dates, times) is set in Archivo. All sans text uses one size (`--t`).
 
-Open `index.html` in a browser — that's the whole workflow. Keep it in the same
-folder as `mark.gif` or the animation won't load.
+## Behaviour
 
-The mark is drawn with `mix-blend-mode: multiply`, so its white background drops
-out onto the paper colour. If you swap the image, keep it high-contrast black on
-white or that trick stops working.
-
-Colours and fonts are CSS custom properties at the top of the `<style>` block.
+- **Poem**: hover a dot to reveal its word; hover the corner glyph to reveal all of it. On touch screens, tap instead. Word size is calculated from the column width so the longest word always fits.
+- **Phone**: the sidebar is hidden; the page is just the poem (two columns). Hours, address and the newsletter link live in the footer.
+- **Calendar**: scrolls the footer up over the page to show the events row.
+- **Gallery**: opens the gallery EOI popup. **Subscribe** / "Sign up to our newsletter": MailerLite popup. **Events EOI**: `/event-submissions`. **Shush**: the forum.
+- **Footer**: the page is sticky; scrolling slides the footer up over it. On desktop the footer is a horizontal row of upcoming events from Discourse; on phones it also carries the hours/address block.
 
 ## Events
 
-The events list pulls upcoming events from Discourse. Config is at the top of
-the `<script>` block in `index.html`:
+Config is at the top of the `<script>` block in `index.html` (`CONFIG.forum`, `limit`, `timeZone`).
+Times are shown in Sydney time regardless of where the visitor is.
 
-```js
-const CONFIG = {
-  forum: 'https://shush.endlesslibrary.com.au',
-  limit: 6,
-  demo: true
-};
+The feed only answers browsers on the origin listed in Discourse's CORS settings,
+which is exactly `https://endlesslibrary.com.au`. Events load on the live site
+over HTTPS but show a "see what's on at Shush" message when opened from disk,
+from `localhost`, or over plain `http://`. In `containers/app.yml` on the VPS:
+
+```yaml
+DISCOURSE_ENABLE_CORS: true
+DISCOURSE_CORS_ORIGIN: 'https://endlesslibrary.com.au'
 ```
 
-`demo: true` keeps the placeholder events visible if the fetch fails, so the
-page still looks right when opened from disk. **Set it to `false` once the live
-feed works** — otherwise a broken fetch shows six invented events to the public.
-
-Requirements on the forum side:
-
-1. `calendar enabled` and `discourse post event enabled` both on.
-2. CORS allowing this origin. In `containers/app.yml` on the VPS:
-   ```yaml
-   DISCOURSE_ENABLE_CORS: true
-   DISCOURSE_CORS_ORIGIN: 'https://endlesslibrary.com.au'
-   ```
-   then add `https://endlesslibrary.com.au` to the `cors origins` site setting.
-
-Field mapping from the Discourse response lives in `normalise()`. If events show
-up with missing titles or times, open
-`https://shush.endlesslibrary.com.au/discourse-post-event/events.json?include_details=true`
-and compare the field names.
+then add `https://endlesslibrary.com.au` to the `cors origins` site setting.
+Field mapping from the Discourse response lives in `normalise()`; if events show
+up with missing titles or times, compare against
+`https://shush.endlesslibrary.com.au/discourse-post-event/events.json?include_details=true`.
 
 ## Deploying
 
 Pushes to `main` publish via GitHub Pages. Custom domain is set in
-**Settings → Pages**; don't delete the `CNAME` file GitHub creates there.
+**Settings → Pages**; keep **Enforce HTTPS** ticked, because the events feed
+only works from the HTTPS origin.
