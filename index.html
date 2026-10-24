@@ -216,7 +216,7 @@
     width:30vw;
     flex:none;
     height:100%;
-    border-right:2px solid var(--rule);
+    border-right:1.5px solid var(--rule);
     display:flex;
     flex-direction:column;
     justify-content:space-between;
@@ -268,8 +268,9 @@
   }
 
   /* ─────────── poem ───────────
-     A grid of dots. Hover a dot and its word fades in beside it; hover
-     the little glyph in the corner and the whole poem appears at once. */
+     A grid of reference points. Each dot sits at the centre of its (hidden)
+     word; hover it and the dot fades out as the word fades in. Hover the
+     little glyph in the corner and the whole poem appears at once.       */
   .page-content{container-type:inline-size}
   .poem{
     /* Each word's size is worked out from its column width (container query
@@ -280,7 +281,6 @@
     --padl:var(--pad);
     --padr:var(--pad);
     --wpad:10px;
-    --dotw:20px;
     --r:3.1;
     --fs-max:30px;
     display:grid;
@@ -299,27 +299,52 @@
     color:var(--red);
     white-space:nowrap;
     font-size:22px;
-    font-size:min(var(--fs-max), calc(((100cqi - var(--padl) - var(--padr) - (var(--cols) - 1) * var(--gap)) / var(--cols) - 2 * var(--wpad) - var(--dotw)) / var(--r)));
+    font-size:min(var(--fs-max), calc(((100cqi - var(--padl) - var(--padr) - (var(--cols) - 1) * var(--gap)) / var(--cols) - 2 * var(--wpad)) / var(--r)));
   }
+  .wd{position:relative;display:block}
   .dot{
-    font-family:var(--sans);
-    font-size:var(--t);
-    width:var(--dotw);
-    flex:none;
+    position:absolute;
+    left:50%;
+    top:calc(50% - .13em);          /* line box includes descender room; lift to the letters' centre */
+    width:4px;
+    height:4px;
+    margin:-2px 0 0 -2px;
+    border-radius:50%;
+    background:currentColor;
     cursor:default;
-    transition:opacity .5s ease;
+    /* going back to idle: the word leaves first, then the dot returns */
+    transition:opacity .6s ease .3s;
   }
-  .dot::before{content:"\2022"}
   .w{
+    display:block;
     font-family:var(--script);
     opacity:0;
-    transition:opacity .6s cubic-bezier(.33,1,.68,1);
-    transition-delay:0s;
+    transition:opacity .5s ease-out;
   }
-  .word.on .w{opacity:1}
-  @media (hover:hover){ .word:hover .w{opacity:1} }
-  .poem.reveal .w{opacity:1;transition-delay:calc(var(--i) * 35ms)}
-  .poem.reveal .dot{opacity:0}
+
+  /* Revealing: the dot goes quickly, the word arrives a beat later and more
+     slowly, so the two barely overlap. --d staggers the reveal-all sweep.  */
+  .word.on .dot,
+  .poem.reveal .dot{
+    opacity:0;
+    transition:opacity .22s ease-out calc(var(--d, 0) * 1ms);
+  }
+  .word.on .w,
+  .poem.reveal .w{
+    opacity:1;
+    transition:opacity .9s cubic-bezier(.33,1,.68,1) calc(var(--d, 0) * 1ms + 180ms);
+  }
+  .poem.reveal .word{--d:calc(var(--i) * 35)}
+  @media (hover:hover){
+    .word:hover .dot{
+      opacity:0;
+      transition:opacity .22s ease-out;
+    }
+    .word:hover .w{
+      opacity:1;
+      transition:opacity .9s cubic-bezier(.33,1,.68,1) 180ms;
+    }
+  }
 
   .poem-reveal{
     position:absolute;
@@ -556,7 +581,6 @@
       --cols:2;
       --gap:12px;
       --wpad:4px;
-      --dotw:16px;
       --padl:var(--pad);
       --padr:var(--pad);
       --fs-max:26px;
@@ -694,7 +718,7 @@
     const li = document.createElement('li');
     li.className = 'word';
     li.style.setProperty('--i', i);
-    li.innerHTML = '<span class="dot"></span><span class="w"></span>';
+    li.innerHTML = '<span class="wd"><span class="w"></span><span class="dot"></span></span>';
     li.querySelector('.w').textContent = word;
     // touch screens have no hover: a tap toggles the word instead
     li.addEventListener('click', () => li.classList.toggle('on'));
